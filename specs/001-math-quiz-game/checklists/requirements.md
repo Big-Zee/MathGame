@@ -35,3 +35,12 @@
 - Answer format (multiple-choice) is documented as an assumption in the Assumptions section.
 - Star rating thresholds (FR-014) are set to be achievable with normal play and motivating
   for high performers; can be tuned during implementation if playtesting suggests adjustment.
+
+## Amendment 2026-04-28
+
+All checklist items remain passing after spec amendment. Changes applied:
+- FR-005: timer updated 10 s → 15 s (all timer references in scenarios updated to match)
+- FR-003: ≤ 100 result cap added for all four operations
+- FR-016 (new): +5 bonus points for correct answers within 8 seconds
+- US3 Scenario 4 (new): acceptance scenario covering the timer bonus mechanic
+- Assumptions updated to note the ≤ 100 cap and 8-second bonus threshold rationale

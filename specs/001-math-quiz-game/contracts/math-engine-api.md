@@ -4,6 +4,8 @@
 **Consumed by**: `index.html` (inline `<script>`), `tests/math-engine.test.js`
 **Dependencies**: None (pure functions, no DOM, no imports)
 **Export style**: ES module named exports (`export function ...`)
+**Amended**: 2026-04-28 — `generateQuestion` enforces ≤ 100 result cap; `applyTimerBonus` added;
+  `GameConfig` gains `timerSeconds: 15`, `timerBonusThreshold: 8`, `timerBonusPts: 5`
 
 ---
 
@@ -25,6 +27,7 @@ distributed across all four types (random order).
 **Guarantees**:
 - Length equals `config.totalQuestions` (10)
 - Each question has 4 unique choices including the correct answer
+- All answers are ≤ 100
 - All division questions have whole-number answers
 - All subtraction results are positive
 
@@ -45,6 +48,12 @@ generateQuestion(operation: string, config: GameConfig, id: number): Question
 | `id` | `number` | 0-based position in the round (0–9) |
 
 **Returns**: A `Question` object with `id`, `operation`, `symbol`, `a`, `b`, `answer`, `choices`.
+
+**Guarantees** (per-operation ≤ 100 enforcement):
+- `add`: `a + b ≤ 100`; `b ∈ [1, 100 − a]`
+- `sub`: `a − b > 0` and `a − b ≤ 100`
+- `mul`: `a × b ≤ 100`; `a ∈ [2, floor(100 / b)]`
+- `div`: answer (quotient) `≤ floor(100 / b)`
 
 ---
 
@@ -127,6 +136,32 @@ calculateStars(score: number, config: GameConfig): 1 | 2 | 3
 | `score < config.starThresholds.two` | `1` |
 | `config.starThresholds.two <= score < config.starThresholds.three` | `2` |
 | `score >= config.starThresholds.three` | `3` |
+
+---
+
+## applyTimerBonus(timerTicks, config)
+
+Returns the bonus points earned based on how many ticks remain when the player answered.
+
+```
+applyTimerBonus(timerTicks: number, config: GameConfig): { bonusPts: number }
+```
+
+| Parameter | Type | Description |
+|-----------|------|-------------|
+| `timerTicks` | `number` | Remaining ticks at moment of answer (0–150) |
+| `config` | `GameConfig` | For `timerSeconds`, `timerBonusThreshold`, `timerBonusPts` |
+
+**Returns**: `{ bonusPts: number }` — `config.timerBonusPts` (5) when the answer was given
+within `config.timerBonusThreshold` seconds, otherwise `0`.
+
+**Threshold logic**: Elapsed seconds = `(config.timerSeconds × 10 − timerTicks) / 10`.
+Bonus applies when elapsed seconds `< config.timerBonusThreshold`.
+Equivalently: `timerTicks > config.timerSeconds × 10 − config.timerBonusThreshold × 10`
+→ `timerTicks > 70` for the default 15 s / 8 s configuration.
+
+**Note**: Only called for correct answers. The caller (`showFeedback` in `index.html`) is
+responsible for gating: `applyTimerBonus` is not called on wrong answers or timer expiry.
 
 ---
 

@@ -2,16 +2,19 @@
 
 **Feature Branch**: `001-math-quiz-game`
 **Created**: 2026-04-28
-**Status**: Draft
+**Amended**: 2026-04-28
+**Status**: Amended
 **Input**: User description: "Build a fun math quiz game for 9-10 year olds covering addition,
-subtraction, multiplication and division. Kids earn points, have 3 lives (hearts), face a 10-second
+subtraction, multiplication and division. Kids earn points, have 3 lives (hearts), face a 15-second
 timer per question, get streak bonuses, see emoji feedback, and a star rating at the end."
+**Amendment**: Timer increased from 10 s to 15 s; +5 bonus points awarded for answers within 8 s;
+all question results capped at ≤ 100.
 
 ## User Scenarios & Testing *(mandatory)*
 
 ### User Story 1 - Play a Full Game Round (Priority: P1)
 
-A child opens the game, starts a quiz, answers questions one-by-one against a 10-second countdown,
+A child opens the game, starts a quiz, answers questions one-by-one against a 15-second countdown,
 receives emoji feedback after each answer, and reaches an end screen with a star rating and final
 score.
 
@@ -25,7 +28,7 @@ and star rating displayed.
 **Acceptance Scenarios**:
 
 1. **Given** the game is on the Start screen, **When** the player taps "Play", **Then** the first
-   question appears with four answer choices and a 10-second countdown begins.
+   question appears with four answer choices and a 15-second countdown begins.
 2. **Given** a question is displayed, **When** the player selects the correct answer before the
    timer reaches zero, **Then** a positive emoji (e.g. ✅ or 🎉) is displayed and the next
    question loads.
@@ -55,8 +58,8 @@ screen appears with the appropriate score.
    icon changes to an empty/broken state and the remaining heart count decreases by one.
 2. **Given** the player has 1 heart remaining, **When** they give a wrong answer, **Then** all
    hearts are empty, the round ends immediately, and the Results screen appears.
-3. **Given** a question is active, **When** the 10-second timer expires, **Then** it is treated
-   identically to a wrong answer (one heart lost, correct answer shown).
+3. **Given** a question is active, **When** the 15-second timer expires, **Then** it is treated
+   identically to a wrong answer (one heart lost, correct answer shown, no timer bonus awarded).
 
 ---
 
@@ -82,6 +85,9 @@ base award, and a single wrong answer resets the streak counter to zero.
 3. **Given** a streak is active, **When** the player gives a wrong answer or the timer expires,
    **Then** the streak counter resets to zero and no bonus points are awarded for the next
    correct answer.
+4. **Given** a question is displayed, **When** the player answers correctly within 8 seconds,
+   **Then** an extra 5 bonus points are added to their score in addition to any base or streak
+   points; answering after 8 seconds awards no timer bonus.
 
 ---
 
@@ -104,11 +110,13 @@ base award, and a single wrong answer resets the streak counter to zero.
 - **FR-002**: Each question MUST be drawn randomly from the four operations: addition,
   subtraction, multiplication, and division.
 - **FR-003**: All numbers used in questions MUST be appropriate for ages 9–10:
-  operands 1–12 for multiplication/division; operands 1–99 for addition/subtraction;
-  division MUST produce whole-number results only.
+  operands chosen so that the result of every operation is ≤ 100; multiplication operands
+  MUST be in the range 1–12 with their product ≤ 100; addition operands MUST be chosen so
+  their sum ≤ 100; subtraction MUST produce a positive result ≤ 100; division MUST produce
+  a whole-number result ≤ 100.
 - **FR-004**: Each question MUST display exactly 4 multiple-choice answer options; one option
   MUST be the correct answer; all four options MUST be unique.
-- **FR-005**: A 10-second countdown timer MUST be visible and actively counting down from the
+- **FR-005**: A 15-second countdown timer MUST be visible and actively counting down from the
   moment a question appears.
 - **FR-006**: Timer expiry MUST be treated as a wrong answer: one life is deducted and the
   correct answer is revealed before the next question loads.
@@ -127,6 +135,8 @@ base award, and a single wrong answer resets the streak counter to zero.
   70 pts or more; 3 stars = 130 pts or more (achievable with a full streak run).
 - **FR-015**: The player MUST be able to start a new round from the Results screen without
   reloading the page.
+- **FR-016**: A correct answer submitted within 8 seconds of a question appearing MUST award
+  an additional 5 bonus points on top of any base or streak points for that answer.
 
 ### Key Entities
 
@@ -157,8 +167,11 @@ base award, and a single wrong answer resets the streak counter to zero.
   the experience accessible and fast for young players.
 - A round consists of exactly 10 questions.
 - Difficulty is fixed (no difficulty selection screen); problems are randomly generated within
-  the grade 4–5 number range defined in FR-003.
+  the grade 4–5 number range defined in FR-003, with all results capped at ≤ 100.
 - Operations are mixed randomly within a round; the player does not choose operation types.
 - Score and progress are session-only; no persistent storage or user accounts in v1.
 - The game targets a single player on a single device at a time; multiplayer is out of scope.
 - A "pause" feature is out of scope for v1; the timer runs regardless of tab visibility.
+- The timer bonus threshold (8 seconds) is measured from the moment the question first appears
+  on screen; the 15-second total limit gives players a comfortable window to think before the
+  bonus window closes.

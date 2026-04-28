@@ -133,6 +133,41 @@ streak indicator disappears and next correct answer earns 10 pts again.
 
 ---
 
+## Amendment: Timer 15 s + Timer Bonus + ≤ 100 Result Cap (Branch: 002-timer-answer-cap)
+
+**Purpose**: Implement two spec changes from amendment dated 2026-04-28.
+  1. Timer increased to 15 s (FR-005); +5 pts for correct answers within 8 s (FR-016)
+  2. All question results capped at ≤ 100 for all four operations (FR-003)
+
+**Baseline**: T001–T024 implemented and passing on branch `001-math-quiz-game`. T025–T026 are
+manual audits and remain pending. Amendment tasks below are additive changes only.
+
+### Phase A: Tests ⚠️ WRITE FIRST — CONFIRM FAILING before implementing T031–T035
+
+- [x] T027 [US1] Write failing unit tests for ≤ 100 answer constraint in `tests/math-engine.test.js`: inside the existing `generateQuestion` describe block, add one `it` per operation (4 total) asserting `q.answer <= 100` over 30 random calls each — `node --test` must show these 4 assertions FAIL before continuing
+- [x] T028 [P] [US3] Write failing unit tests for `applyTimerBonus(timerTicks, config)` in `tests/math-engine.test.js`: add `applyTimerBonus` to imports; new `describe('applyTimerBonus', ...)` block: (a) `timerTicks=150` → `bonusPts` equals `config.timerBonusPts` (5), (b) `timerTicks=71` → `bonusPts=5`, (c) `timerTicks=70` → `bonusPts=0` (boundary: not within threshold), (d) `timerTicks=0` → `bonusPts=0` — `node --test` must show these 4 tests FAIL before continuing
+
+### Phase B: US1 Amendment — ≤ 100 Constraint + 15-second Timer
+
+- [x] T029 [US1] Update `GameConfig` in `js/math-engine.js`: set `timerSeconds: 15`; add `timerBonusThreshold: 8` and `timerBonusPts: 5` fields; change `numberRanges.add.bMax` from `99` to `null`; change `numberRanges.div.aMax` from `144` to `100`
+- [x] T030 [US1] Update `maxAnswerFor()` helper in `js/math-engine.js`: replace all four operation-specific return values with a single `return 100` — this sets the distractor ceiling to 100 for all operations, keeping generated wrong-answer choices within plausible range
+- [x] T031 [US1] Update `generateQuestion()` in `js/math-engine.js` for ≤ 100 cap: (a) `add` case: change `b = randInt(r.bMin, r.bMax)` to `b = randInt(r.bMin, 100 - a)`; (b) `mul` case: change `a = randInt(r.aMin, r.aMax)` to `a = randInt(r.aMin, Math.floor(100 / b))`; (c) `div` case: change `quotient = randInt(1, 12)` to `quotient = randInt(1, Math.floor(100 / b))` — run `node --test` and verify T027 tests now PASS
+- [x] T032 [US1] Update `startTimer()` in `index.html`: change `session.timerTicks = 100` to `session.timerTicks = GameConfig.timerSeconds * 10` (evaluates to 150); update timer progressbar `width` style and `aria-valuenow` to use `session.timerTicks / (GameConfig.timerSeconds * 10)` as the fraction instead of `/ 100`
+- [x] T033 [US1] Update Start screen instructions in `index.html` `#screen-start`: change "10 seconds" to "15 seconds" in the instructions paragraph; add a second line "⚡ Answer within 8 seconds for a speed bonus!"
+
+### Phase C: US3 Amendment — Timer Bonus Mechanic
+
+- [x] T034 [US3] Implement `applyTimerBonus(timerTicks, config)` in `js/math-engine.js`: export pure function that returns `{ bonusPts: config.timerBonusPts }` when `timerTicks > (config.timerSeconds - config.timerBonusThreshold) * 10` (i.e. `timerTicks > 70` for 15 s / 8 s default), else returns `{ bonusPts: 0 }` — run `node --test` and verify T028 tests PASS
+- [x] T035 [US3] Update `showFeedback()` in `index.html`: (a) add `applyTimerBonus` to the `import` statement from `./js/math-engine.js`; (b) on correct answer, call `const bonus = applyTimerBonus(session.timerTicks, GameConfig)` and add `bonus.bonusPts` to `session.score`; (c) when `bonus.bonusPts > 0`, append `" ⚡ +5"` to the feedback text in the `aria-live` container and set its `aria-label` to include "Speed bonus! 5 extra points"
+
+### Phase D: Validation
+
+- [x] T036 Run `node --test tests/math-engine.test.js` and confirm all tests pass (expect 34 total: 28 original + 4 T027 + 4 T028 = 36 — note: T027 adds 4 per-operation tests not 1); log the exact pass count
+- [ ] T037 [P] Manual browser smoke test against locally-served `index.html`: (a) verify countdown visibly starts at 15 s; (b) answer a question within 8 s — confirm "⚡ +5" text appears in feedback and score reflects base + bonus; (c) answer a question after 8 s — confirm no bonus indicator and score only increments by base pts; (d) open DevTools console, call `generateQuestion('mul', GameConfig, 0)` 20 times and confirm all `answer` values ≤ 100
+- [ ] T038 [P] Re-run T025 accessibility checks on the amended Start screen and feedback phase: verify the new "⚡ +5" indicator has a proper `aria-label`; verify the 15-second timer text update reads correctly via screen reader; update `specs/001-math-quiz-game/checklists/accessibility.md` with amendment audit results
+
+---
+
 ## Dependencies & Execution Order
 
 ### Phase Dependencies
@@ -142,49 +177,33 @@ streak indicator disappears and next correct answer earns 10 pts again.
 - **User Stories (Phase 3–5)**: ALL depend on Phase 2 completion
   - Phase 3 (US1) must complete before Phase 4 (US2) and Phase 5 (US3) begin — US2 and US3 build on the FEEDBACK phase wired in US1
 - **Polish (Phase 6)**: Depends on Phase 3–5 completion; T023, T024, T026 are parallel
+- **Amendment Phase A**: Can begin immediately — T027 and T028 are parallel (different test blocks)
+- **Amendment Phase B**: Depends on Phase A tests confirmed failing; T029–T033 run sequentially (same file or wiring dependency)
+- **Amendment Phase C**: T034 depends on T029 (GameConfig needs timerBonusPts); T035 depends on T034 (imports applyTimerBonus); T034 and T035 can start once Phase A tests are confirmed failing
+- **Amendment Phase D**: Depends on Phase B and C completion
 
-### User Story Dependencies
+### Parallel Opportunities (Amendment)
 
-- **US1 (P1)**: Can start after Phase 2 — independent
-- **US2 (P2)**: Depends on US1 (wires into `showFeedback()` and `renderQuestion()` from US1)
-- **US3 (P3)**: Depends on US1 (wires into `showFeedback()` from US1); can run in parallel with US2
-
-### Within Each User Story (TDD order)
-
-1. Write tests → confirm they FAIL
-2. Implement logic module functions
-3. Wire UI in `index.html`
-4. Run `node --test` → confirm tests PASS
-5. Manual browser verification at checkpoint
-
-### Parallel Opportunities
-
-- T002 + T003 (Phase 1) — different files
-- T004 + T005 (Phase 2) — same file (`index.html`) but different blocks; proceed sequentially if same developer
-- T006 + T007 + T008 (US1 tests) — all different test blocks in same file; can be batched
-- T020 (US3 test) — independent of US2 tasks; can run in parallel with T017–T019
-- T023 + T024 + T026 (Polish) — different concerns
+- T027 + T028 — different describe blocks in same test file; write sequentially to avoid conflicts
+- T032 + T033 — different sections of `index.html`; can be batched in one edit session
+- T037 + T038 — independent browser checks
 
 ---
 
 ## Implementation Strategy
 
-### MVP First (User Story 1 Only)
+### Original MVP (complete on branch 001-math-quiz-game)
 
-1. Complete Phase 1: Setup (T001–T003)
-2. Complete Phase 2: Foundational (T004–T005)
-3. Write US1 tests (T006–T008) — confirm failing
-4. Implement US1 logic (T009–T011) — confirm tests pass
-5. Wire US1 UI (T012–T016)
-6. **STOP and VALIDATE**: Play a full 10-question round in the browser
-7. Deploy MVP to Azure SWA for stakeholder review
+Phases 1–6, tasks T001–T024 implemented and passing. 28/28 unit tests pass.
 
-### Incremental Delivery
+### Amendment Delivery
 
-1. MVP (US1) → playable 10-question game with flat scoring and static hearts
-2. Add US2 (T017–T019) → hearts deduct, game ends early on 0 lives
-3. Add US3 (T020–T022) → streak bonus scoring activates
-4. Polish (T023–T026) → WCAG AA compliance confirmed
+1. Write failing tests (T027–T028) — confirm 4 + 4 = 8 new test failures
+2. Update GameConfig + generation logic (T029–T031) — confirm T027 tests now pass
+3. Wire 15-second timer in UI (T032–T033)
+4. Add applyTimerBonus to logic (T034) — confirm T028 tests now pass
+5. Wire bonus in UI feedback (T035)
+6. Full validation run (T036–T038)
 
 ---
 
@@ -195,5 +214,5 @@ streak indicator disappears and next correct answer earns 10 pts again.
 - All test tasks MUST produce failing tests before paired implementation tasks begin
 - Run `node --test tests/math-engine.test.js` after every implementation task
 - `localStorage` functions (`getHighScore`, `setHighScore`) are excluded from Node.js tests — stub or skip them; all other math-engine functions are pure and fully testable
-- Commit after each task or logical group (per Development Workflow step 5)
 - `index.html` uses `<script type="module">` to import from `js/math-engine.js`; serve over HTTP (not `file://`) for local testing
+- Amendment timer tick math: 15 s × 10 ticks/s = 150 total ticks; bonus threshold = (15 − 8) × 10 = 70 ticks remaining
