@@ -1,0 +1,492 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="MathGame – a fun math quiz for ages 9–10">
+  <title>MathGame</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --clr-bg:      #FFF8E7;
+      --clr-card:    #FFFFFF;
+      --clr-primary: #2563EB;
+      --clr-primary-hover: #1D4ED8;
+      --clr-correct: #16A34A;
+      --clr-wrong:   #DC2626;
+      --clr-timer:   #F59E0B;
+      --clr-text:    #1E293B;
+      --clr-muted:   #64748B;
+      --radius:      14px;
+    }
+
+    body {
+      font-family: system-ui, -apple-system, sans-serif;
+      font-size: 18px;
+      background: var(--clr-bg);
+      color: var(--clr-text);
+      min-height: 100svh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 16px;
+    }
+
+    main { width: 100%; max-width: 480px; }
+
+    section {
+      background: var(--clr-card);
+      border-radius: var(--radius);
+      padding: 32px 24px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.09);
+    }
+
+    h1 { font-size: 2.4rem; text-align: center; margin-bottom: 6px; }
+    h2 { font-size: 1.55rem; text-align: center; margin-bottom: 16px; }
+
+    /* ── BUTTONS ── */
+    .btn {
+      display: block;
+      width: 100%;
+      min-height: 52px;
+      padding: 13px 20px;
+      border: none;
+      border-radius: var(--radius);
+      font-size: 1.1rem;
+      font-weight: 700;
+      cursor: pointer;
+      text-align: center;
+    }
+
+    .btn:focus-visible {
+      outline: 3px solid var(--clr-primary);
+      outline-offset: 3px;
+    }
+
+    .btn-primary { background: var(--clr-primary); color: #fff; }
+    .btn-primary:hover { background: var(--clr-primary-hover); }
+    .btn-primary:active { opacity: 0.9; }
+
+    /* ── START SCREEN ── */
+    .subtitle { text-align: center; color: var(--clr-muted); margin-bottom: 20px; }
+
+    .rules { list-style: none; margin-bottom: 20px; }
+    .rules li { text-align: center; padding: 5px 0; font-size: 1rem; }
+
+    .highscore-display {
+      text-align: center;
+      color: var(--clr-muted);
+      font-size: 0.9rem;
+      margin-bottom: 20px;
+      min-height: 1.3em;
+    }
+
+    /* ── GAME SCREEN ── */
+    .game-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 10px;
+    }
+
+    .hearts { font-size: 1.35rem; letter-spacing: 2px; }
+    .score  { font-size: 1.05rem; font-weight: 700; color: var(--clr-primary); }
+
+    .question-counter { text-align: center; color: var(--clr-muted); font-size: 0.9rem; margin-bottom: 6px; }
+
+    .streak {
+      text-align: center;
+      font-size: 1rem;
+      font-weight: 700;
+      color: #C2410C;
+      background: #FFF7ED;
+      border-radius: 8px;
+      padding: 4px 12px;
+      margin-bottom: 8px;
+    }
+
+    .question-text {
+      font-size: 2rem;
+      font-weight: 700;
+      text-align: center;
+      margin: 14px 0 4px;
+      min-height: 2.5rem;
+    }
+
+    .timer-container {
+      height: 10px;
+      background: #E2E8F0;
+      border-radius: 99px;
+      overflow: hidden;
+      margin-bottom: 18px;
+    }
+
+    .timer-bar {
+      height: 100%;
+      width: 100%;
+      background: var(--clr-timer);
+      border-radius: 99px;
+    }
+
+    .choices {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      margin-bottom: 14px;
+    }
+
+    .choice-btn {
+      background: #F1F5F9;
+      color: var(--clr-text);
+      border: 2px solid #CBD5E1;
+      border-radius: var(--radius);
+      min-height: 52px;
+      padding: 12px 8px;
+      font-size: 1.2rem;
+      font-weight: 600;
+      cursor: pointer;
+      text-align: center;
+    }
+
+    .choice-btn:hover:not([disabled]) {
+      background: #DBEAFE;
+      border-color: var(--clr-primary);
+    }
+
+    .choice-btn:focus-visible {
+      outline: 3px solid var(--clr-primary);
+      outline-offset: 3px;
+    }
+
+    .choice-btn[disabled] { cursor: not-allowed; }
+
+    .choice-btn.correct { background: #DCFCE7; border-color: var(--clr-correct); color: var(--clr-correct); }
+    .choice-btn.wrong   { background: #FEE2E2; border-color: var(--clr-wrong);   color: var(--clr-wrong);   }
+
+    .feedback {
+      min-height: 2rem;
+      text-align: center;
+      font-size: 1.3rem;
+      font-weight: 700;
+    }
+
+    /* ── RESULTS SCREEN ── */
+    .stars          { text-align: center; font-size: 2.6rem; letter-spacing: 4px; margin: 6px 0 20px; }
+    .result-score   { text-align: center; font-size: 1.4rem; font-weight: 700; color: var(--clr-primary); margin-bottom: 8px; }
+    .result-correct { text-align: center; color: var(--clr-muted); margin-bottom: 4px; }
+    .result-highscore      { text-align: center; color: var(--clr-muted); font-size: 0.9rem; margin-bottom: 4px; }
+    .result-new-highscore  { text-align: center; color: #B45309; font-weight: 700; margin-bottom: 16px; }
+    #btn-play-again { margin-top: 16px; }
+
+    /* ── MOTION: transitions only for users who want them ── */
+    @media (prefers-reduced-motion: no-preference) {
+      .timer-bar { transition: width 0.1s linear; }
+      .streak    { animation: pop-in 0.18s ease-out; }
+      @keyframes pop-in {
+        from { transform: scale(0.8); opacity: 0; }
+        to   { transform: scale(1);   opacity: 1; }
+      }
+    }
+  </style>
+</head>
+<body>
+  <main>
+
+    <!-- ── START SCREEN ── -->
+    <section id="screen-start">
+      <h1>MathGame 🧮</h1>
+      <p class="subtitle">Test your math skills!</p>
+      <ul class="rules">
+        <li>10 questions per round</li>
+        <li>You have <strong>10 seconds</strong> per question ⏱️</li>
+        <li>3 lives ❤️❤️❤️ — don't lose them all!</li>
+        <li>Answer streaks earn <strong>bonus points</strong> 🔥</li>
+      </ul>
+      <div id="start-highscore" class="highscore-display" aria-live="polite"></div>
+      <button class="btn btn-primary" id="btn-play">▶ Play!</button>
+    </section>
+
+    <!-- ── GAME SCREEN ── -->
+    <section id="screen-game" hidden>
+      <header class="game-header">
+        <div id="hearts-container" class="hearts" aria-live="polite" aria-label="Lives remaining: 3">
+          ❤️❤️❤️
+        </div>
+        <div id="score-display" class="score" aria-label="Score: 0">Score: 0</div>
+      </header>
+
+      <div id="question-counter" class="question-counter" aria-live="polite">
+        Question 1 of 10
+      </div>
+
+      <div id="streak-indicator" class="streak" hidden aria-live="polite" aria-label="Streak bonus active!">
+        🔥 Streak Bonus!
+      </div>
+
+      <div id="question-text" class="question-text" aria-live="polite"></div>
+
+      <div class="timer-container" aria-hidden="true">
+        <div
+          id="timer-bar"
+          class="timer-bar"
+          role="progressbar"
+          aria-valuenow="100"
+          aria-valuemin="0"
+          aria-valuemax="100"
+          aria-label="Time remaining"
+        ></div>
+      </div>
+
+      <div id="choices-container" class="choices" role="group" aria-label="Answer choices"></div>
+
+      <div id="feedback-container" class="feedback" aria-live="polite" aria-atomic="true"></div>
+    </section>
+
+    <!-- ── RESULTS SCREEN ── -->
+    <section id="screen-results" hidden>
+      <h2>Round Complete! 🎉</h2>
+      <div id="stars-container" class="stars" role="img" aria-label="0 stars out of 3"></div>
+      <p id="result-score"         class="result-score"></p>
+      <p id="result-correct"       class="result-correct"></p>
+      <p id="result-highscore"     class="result-highscore"></p>
+      <p id="result-new-highscore" class="result-new-highscore" hidden>🏆 New high score!</p>
+      <button class="btn btn-primary" id="btn-play-again">▶ Play Again</button>
+    </section>
+
+  </main>
+
+  <script type="module">
+    import {
+      GameConfig,
+      generateRound,
+      evaluateAnswer,
+      calculateStars,
+      updateStreak,
+      applyWrongAnswer,
+      getHighScore,
+      setHighScore,
+    } from './js/math-engine.js';
+
+    // ── STATE ──────────────────────────────────────────────────────────────
+
+    let session = null;
+
+    function newSession() {
+      return {
+        score: 0,
+        lives: 3,
+        streak: 0,
+        questionIndex: 0,
+        correctAnswers: 0,
+        questionsAnswered: 0,
+        questions: generateRound(GameConfig),
+        timerTicks: GameConfig.timerSeconds * 10,
+        timerHandle: null,
+        phase: 'question',
+      };
+    }
+
+    // ── SCREEN ROUTING ─────────────────────────────────────────────────────
+
+    function showScreen(id) {
+      document.querySelectorAll('main > section').forEach(s => {
+        s.hidden = s.id !== id;
+      });
+    }
+
+    // ── HEARTS ─────────────────────────────────────────────────────────────
+
+    function renderHearts(lives) {
+      const el = document.getElementById('hearts-container');
+      el.textContent = '❤️'.repeat(lives) + '🤍'.repeat(3 - lives);
+      el.setAttribute('aria-label', `Lives remaining: ${lives}`);
+    }
+
+    // ── TIMER ──────────────────────────────────────────────────────────────
+
+    function updateTimerBar() {
+      const bar = document.getElementById('timer-bar');
+      const total = GameConfig.timerSeconds * 10;
+      const pct = Math.max(0, (session.timerTicks / total) * 100);
+      bar.style.width = `${pct}%`;
+      bar.setAttribute('aria-valuenow', String(Math.round(pct)));
+      bar.style.background = pct > 40 ? 'var(--clr-timer)' : 'var(--clr-wrong)';
+    }
+
+    function stopTimer() {
+      if (session.timerHandle !== null) {
+        clearInterval(session.timerHandle);
+        session.timerHandle = null;
+      }
+    }
+
+    function startTimer() {
+      session.timerTicks = GameConfig.timerSeconds * 10;
+      updateTimerBar();
+      session.timerHandle = setInterval(() => {
+        session.timerTicks--;
+        updateTimerBar();
+        if (session.timerTicks <= 0) {
+          stopTimer();
+          showFeedback(null, true);
+        }
+      }, 100);
+    }
+
+    // ── QUESTION RENDERING ─────────────────────────────────────────────────
+
+    function renderQuestion() {
+      const q = session.questions[session.questionIndex];
+
+      document.getElementById('question-counter').textContent =
+        `Question ${session.questionIndex + 1} of ${GameConfig.totalQuestions}`;
+
+      const qtEl = document.getElementById('question-text');
+      qtEl.textContent = `${q.a} ${q.symbol} ${q.b} = ?`;
+      qtEl.setAttribute('aria-label', `What is ${q.a} ${q.symbol} ${q.b}?`);
+
+      document.getElementById('score-display').textContent = `Score: ${session.score}`;
+      document.getElementById('score-display').setAttribute('aria-label', `Score: ${session.score}`);
+      renderHearts(session.lives);
+
+      document.getElementById('streak-indicator').hidden =
+        session.streak < GameConfig.streakThreshold;
+
+      document.getElementById('feedback-container').textContent = '';
+
+      const container = document.getElementById('choices-container');
+      container.innerHTML = '';
+      for (const choice of q.choices) {
+        const btn = document.createElement('button');
+        btn.className = 'choice-btn';
+        btn.textContent = String(choice);
+        btn.setAttribute('aria-pressed', 'false');
+        btn.addEventListener('click', () => {
+          if (session.phase === 'question') {
+            session.phase = 'feedback';
+            showFeedback(choice, false);
+          }
+        });
+        container.appendChild(btn);
+      }
+
+      const firstBtn = container.querySelector('button');
+      if (firstBtn) firstBtn.focus();
+
+      startTimer();
+    }
+
+    // ── FEEDBACK ───────────────────────────────────────────────────────────
+
+    function showFeedback(selectedChoice, timedOut) {
+      stopTimer();
+      session.phase = 'feedback';
+      session.questionsAnswered++;
+
+      const q = session.questions[session.questionIndex];
+      const correct = !timedOut && evaluateAnswer(q, selectedChoice).correct;
+      if (correct) session.correctAnswers++;
+
+      // Disable buttons + highlight correct/wrong
+      const buttons = [...document.querySelectorAll('#choices-container .choice-btn')];
+      for (const btn of buttons) {
+        btn.disabled = true;
+        btn.setAttribute('aria-disabled', 'true');
+        const val = Number(btn.textContent);
+        if (val === q.answer) {
+          btn.classList.add('correct');
+        } else if (!timedOut && val === selectedChoice) {
+          btn.classList.add('wrong');
+        }
+      }
+
+      // Emoji feedback
+      const feedbackEl = document.getElementById('feedback-container');
+      if (correct) {
+        feedbackEl.textContent = '🎉 Correct!';
+      } else if (timedOut) {
+        feedbackEl.textContent = `⏰ Time's up! Answer: ${q.answer}`;
+      } else {
+        feedbackEl.textContent = `😬 Wrong! Answer: ${q.answer}`;
+      }
+
+      // Score + streak (US3)
+      const { newStreak, pts } = updateStreak(session.streak, correct, GameConfig);
+      session.streak = newStreak;
+      session.score += pts;
+      document.getElementById('score-display').textContent = `Score: ${session.score}`;
+      document.getElementById('score-display').setAttribute('aria-label', `Score: ${session.score}`);
+      document.getElementById('streak-indicator').hidden =
+        session.streak < GameConfig.streakThreshold;
+
+      // Lives (US2)
+      if (!correct) {
+        const { newLives, isGameOver } = applyWrongAnswer(session.lives);
+        session.lives = newLives;
+        renderHearts(session.lives);
+        if (isGameOver) {
+          setTimeout(showResults, 1200);
+          return;
+        }
+      }
+
+      setTimeout(advanceRound, 1000);
+    }
+
+    function advanceRound() {
+      session.questionIndex++;
+      if (session.questionIndex >= GameConfig.totalQuestions) {
+        showResults();
+      } else {
+        session.phase = 'question';
+        renderQuestion();
+      }
+    }
+
+    // ── RESULTS ────────────────────────────────────────────────────────────
+
+    function showResults() {
+      showScreen('screen-results');
+
+      const stars = calculateStars(session.score, GameConfig);
+      const starsEl = document.getElementById('stars-container');
+      starsEl.setAttribute('aria-label', `${stars} stars out of 3`);
+      starsEl.innerHTML = [0, 1, 2]
+        .map(i => `<span aria-hidden="true">${i < stars ? '⭐' : '☆'}</span>`)
+        .join('');
+
+      document.getElementById('result-score').textContent =
+        `You scored ${session.score} points!`;
+      document.getElementById('result-correct').textContent =
+        `${session.correctAnswers} out of ${session.questionsAnswered} correct`;
+
+      const prevHigh = getHighScore();
+      const isNewHigh = session.score > prevHigh;
+      if (isNewHigh) setHighScore(session.score);
+      document.getElementById('result-highscore').textContent =
+        `Best: ${isNewHigh ? session.score : prevHigh} pts`;
+      document.getElementById('result-new-highscore').hidden = !isNewHigh;
+
+      document.getElementById('btn-play-again').focus();
+    }
+
+    // ── GAME START ─────────────────────────────────────────────────────────
+
+    function startGame() {
+      session = newSession();
+      showScreen('screen-game');
+      renderQuestion();
+    }
+
+    document.getElementById('btn-play').addEventListener('click', startGame);
+    document.getElementById('btn-play-again').addEventListener('click', startGame);
+
+    // Show high score on start screen if one exists
+    const hs = getHighScore();
+    if (hs > 0) {
+      document.getElementById('start-highscore').textContent = `Best: ${hs} pts`;
+    }
+  </script>
+</body>
+</html>
