@@ -1,16 +1,18 @@
 export const GameConfig = {
   totalQuestions: 10,
-  timerSeconds: 10,
+  timerSeconds: 15,
+  timerBonusThreshold: 8,
+  timerBonusPts: 5,
   basePts: 10,
   streakPts: 15,
   streakThreshold: 3,
   starThresholds: { two: 70, three: 130 },
   operations: ['add', 'sub', 'mul', 'div'],
   numberRanges: {
-    add: { aMin: 1,  aMax: 99, bMin: 1, bMax: 99 },
+    add: { aMin: 1,  aMax: 99, bMin: 1, bMax: null },
     sub: { aMin: 10, aMax: 99, bMin: 1, bMax: null },
     mul: { aMin: 2,  aMax: 12, bMin: 2, bMax: 12 },
-    div: { aMin: 4,  aMax: 144, bMin: 2, bMax: 12 },
+    div: { aMin: 4,  aMax: 100, bMin: 2, bMax: 12 },
   },
 };
 
@@ -27,12 +29,8 @@ function shuffle(arr) {
   return a;
 }
 
-function maxAnswerFor(operation, config) {
-  const r = config.numberRanges[operation];
-  if (operation === 'add') return r.aMax + r.bMax;
-  if (operation === 'sub') return r.aMax - 1;
-  if (operation === 'mul') return r.aMax * r.bMax;
-  return 12; // div: max quotient
+function maxAnswerFor(_operation, _config) {
+  return 100;
 }
 
 export function buildChoices(answer, operation, config) {
@@ -65,7 +63,7 @@ export function generateQuestion(operation, config, id) {
   switch (operation) {
     case 'add':
       a = randInt(r.aMin, r.aMax);
-      b = randInt(r.bMin, r.bMax);
+      b = randInt(r.bMin, 100 - a);
       answer = a + b;
       break;
     case 'sub':
@@ -74,13 +72,13 @@ export function generateQuestion(operation, config, id) {
       answer = a - b;
       break;
     case 'mul':
-      a = randInt(r.aMin, r.aMax);
       b = randInt(r.bMin, r.bMax);
+      a = randInt(r.aMin, Math.floor(100 / b));
       answer = a * b;
       break;
     case 'div': {
       b = randInt(r.bMin, r.bMax);
-      const quotient = randInt(1, 12);
+      const quotient = randInt(1, Math.floor(100 / b));
       a = b * quotient;
       answer = quotient;
       break;
@@ -122,6 +120,11 @@ export function updateStreak(streak, correct, config) {
 export function applyWrongAnswer(lives) {
   const newLives = lives - 1;
   return { newLives, isGameOver: newLives <= 0 };
+}
+
+export function applyTimerBonus(timerTicks, config) {
+  const bonusThresholdTicks = (config.timerSeconds - config.timerBonusThreshold) * 10;
+  return { bonusPts: timerTicks > bonusThresholdTicks ? config.timerBonusPts : 0 };
 }
 
 export function getHighScore() {

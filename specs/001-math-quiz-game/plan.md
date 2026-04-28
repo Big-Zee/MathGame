@@ -1,6 +1,7 @@
 # Implementation Plan: Math Quiz Game
 
 **Branch**: `001-math-quiz-game` | **Date**: 2026-04-28 | **Spec**: [spec.md](./spec.md)
+**Amended**: 2026-04-28 — timer 10 s → 15 s; +5 timer bonus within 8 s; all results ≤ 100
 **Input**: Feature specification from `specs/001-math-quiz-game/spec.md`
 
 ## Summary
@@ -8,9 +9,11 @@
 A 10-question math quiz for learners aged 9–10 covering addition, subtraction, multiplication, and
 division. The game runs as a fully static single-page web app (index.html + js/math-engine.js)
 with zero external dependencies, deployed to Azure Static Web Apps free tier. Core mechanics:
-3-heart lives system, 10-second per-question countdown, streak bonus scoring, emoji feedback, and
-a 1–3 star end-screen rating. A pure-logic JS module (`js/math-engine.js`) isolates question
-generation, answer evaluation, and scoring from the DOM to enable unit testing without a browser.
+3-heart lives system, 15-second per-question countdown (with a +5 bonus for answering within
+8 seconds), streak bonus scoring, emoji feedback, and a 1–3 star end-screen rating. All generated
+question results are capped at ≤ 100 across all four operations. A pure-logic JS module
+(`js/math-engine.js`) isolates question generation, answer evaluation, and scoring from the DOM
+to enable unit testing without a browser.
 
 ## Technical Context
 
@@ -27,8 +30,10 @@ generation, answer evaluation, and scoring from the DOM to enable unit testing w
 **Performance Goals**: Feedback rendered within 100ms of answer submission; timer UI updated at
   100ms intervals; total page load < 200KB uncompressed
 **Constraints**: Zero build tools; WCAG 2.1 AA — zero known violations at ship; Azure SWA free
-  tier limits (0.5GB storage, 100GB/month bandwidth); all division problems produce whole-number
-  results only
+  tier limits (0.5GB storage, 100GB/month bandwidth); all operation results are capped at ≤ 100
+  (addition sums ≤ 100, subtraction results positive and ≤ 100, multiplication products ≤ 100,
+  division results whole numbers ≤ 100); timer runs for 15 seconds per question; timer bonus of
+  +5 pts awarded for correct answers submitted within the first 8 seconds
 **Scale/Scope**: Single player, single device, one active round at a time; no server calls
 
 ## Constitution Check
@@ -37,11 +42,11 @@ generation, answer evaluation, and scoring from the DOM to enable unit testing w
 
 | Principle | Status | Notes |
 |-----------|--------|-------|
-| I. Learning-First | ✅ PASS | FR-001–FR-003: addition/subtraction/multiplication/division, grades 4–5 number ranges; streak rewards accuracy. **Deferral**: v1 has fixed difficulty (no adaptive scaling). When scaling is added it MUST be learner-performance-driven per constitution. |
-| II. Kid-Friendly Design (9–10) | ✅ PASS | Answer buttons ≥44×44px enforced in CSS; game text at ≤4th-grade reading level; no hover-only affordances; color reinforces meaning (green/red + emoji + label); `prefers-reduced-motion` respected. |
+| I. Learning-First | ✅ PASS | FR-001–FR-003: all four operations; results capped at ≤ 100 to keep numbers age-appropriate and mentally tractable; streak rewards accuracy; timer bonus rewards speed without punishing slower learners (only additive). **Deferral**: v1 has fixed difficulty (no adaptive scaling). When scaling is added it MUST be learner-performance-driven per constitution. |
+| II. Kid-Friendly Design (9–10) | ✅ PASS | Answer buttons ≥44×44px enforced in CSS; game text at ≤4th-grade reading level; no hover-only affordances; color reinforces meaning (green/red + emoji + label); `prefers-reduced-motion` respected. 15-second timer gives more thinking time for younger learners than the original 10 s. |
 | III. Accessibility (WCAG 2.1 AA) | ✅ PASS | Keyboard nav via Tab+Enter on all interactive elements; visible `:focus-visible` ring; emoji icons carry `aria-label`; contrast targets ≥4.5:1 (dark text on light bg); `h1` → `h2` hierarchy; accessibility audit task in Polish phase. |
-| IV. Test-First | ✅ PASS | `js/math-engine.js` unit tests written first (failing), then implemented. All acceptance scenarios from spec.md have corresponding test assertions before coding. |
-| V. Incremental Delivery | ✅ PASS | 3 user stories (P1/P2/P3) with independent checkpoints; P1 delivers a playable round without scoring depth; P2 adds lives; P3 adds streaks. |
+| IV. Test-First | ✅ PASS | `js/math-engine.js` unit tests written first (failing), then implemented. All acceptance scenarios from spec.md have corresponding test assertions before coding. New `applyTimerBonus` function and updated `generateQuestion` ≤ 100 constraints require new failing tests before implementation. |
+| V. Incremental Delivery | ✅ PASS | 3 user stories (P1/P2/P3) with independent checkpoints; P1 delivers a playable round without scoring depth; P2 adds lives; P3 adds streaks + timer bonus. |
 | VI. Immediate Feedback | ✅ PASS | Feedback rendered synchronously (<100ms). **Resolved**: constitution requires persistence "across sessions" → high score tracked in `localStorage`; game-session score held in memory (satisfies spirit: learner can see improvement across visits). |
 | Technical Standards | ✅ PASS | Vanilla HTML5/ES6+/CSS3; zero frameworks; zero build tools; Azure SWA `staticwebapp.config.json` at repo root; math logic in pure DOM-free module; config as JS data object. |
 

@@ -9,6 +9,7 @@ import {
   calculateStars,
   updateStreak,
   applyWrongAnswer,
+  applyTimerBonus,
 } from '../js/math-engine.js';
 
 // ── T006: buildChoices + generateQuestion invariants ──────────────────────
@@ -59,6 +60,15 @@ describe('generateQuestion', () => {
       assert.ok(q.answer > 0, `non-positive: ${q.answer}`);
     }
   });
+
+  for (const op of GameConfig.operations) {
+    it(`${op}: answer is always ≤ 100`, () => {
+      for (let i = 0; i < 30; i++) {
+        const q = generateQuestion(op, GameConfig, 0);
+        assert.ok(q.answer <= 100, `answer ${q.answer} > 100 for op=${op}`);
+      }
+    });
+  }
 });
 
 // ── T007: generateRound ───────────────────────────────────────────────────
@@ -128,6 +138,30 @@ describe('applyWrongAnswer', () => {
   it('returns isGameOver: false while lives remain', () => {
     assert.equal(applyWrongAnswer(3).isGameOver, false);
     assert.equal(applyWrongAnswer(2).isGameOver, false);
+  });
+});
+
+// ── T028: applyTimerBonus ────────────────────────────────────────────────
+
+describe('applyTimerBonus', () => {
+  it('awards timerBonusPts when full time remains (timerTicks=150)', () => {
+    const r = applyTimerBonus(150, GameConfig);
+    assert.equal(r.bonusPts, GameConfig.timerBonusPts);
+  });
+
+  it('awards timerBonusPts when timerTicks=71 (just above threshold)', () => {
+    const r = applyTimerBonus(71, GameConfig);
+    assert.equal(r.bonusPts, GameConfig.timerBonusPts);
+  });
+
+  it('awards 0 pts when timerTicks=70 (at boundary, not within threshold)', () => {
+    const r = applyTimerBonus(70, GameConfig);
+    assert.equal(r.bonusPts, 0);
+  });
+
+  it('awards 0 pts when timerTicks=0 (timer fully expired)', () => {
+    const r = applyTimerBonus(0, GameConfig);
+    assert.equal(r.bonusPts, 0);
   });
 });
 

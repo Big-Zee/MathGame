@@ -199,7 +199,8 @@
       <p class="subtitle">Test your math skills!</p>
       <ul class="rules">
         <li>10 questions per round</li>
-        <li>You have <strong>10 seconds</strong> per question ⏱️</li>
+        <li>You have <strong>15 seconds</strong> per question ⏱️</li>
+        <li>Answer within <strong>8 seconds</strong> for a speed bonus ⚡</li>
         <li>3 lives ❤️❤️❤️ — don't lose them all!</li>
         <li>Answer streaks earn <strong>bonus points</strong> 🔥</li>
       </ul>
@@ -264,6 +265,7 @@
       calculateStars,
       updateStreak,
       applyWrongAnswer,
+      applyTimerBonus,
       getHighScore,
       setHighScore,
     } from './js/math-engine.js';
@@ -403,18 +405,30 @@
 
       // Emoji feedback
       const feedbackEl = document.getElementById('feedback-container');
-      if (correct) {
-        feedbackEl.textContent = '🎉 Correct!';
-      } else if (timedOut) {
-        feedbackEl.textContent = `⏰ Time's up! Answer: ${q.answer}`;
-      } else {
-        feedbackEl.textContent = `😬 Wrong! Answer: ${q.answer}`;
-      }
-
-      // Score + streak (US3)
+      // Score + streak (US3) + timer bonus (FR-016)
       const { newStreak, pts } = updateStreak(session.streak, correct, GameConfig);
       session.streak = newStreak;
       session.score += pts;
+      let bonusPts = 0;
+      if (correct) {
+        bonusPts = applyTimerBonus(session.timerTicks, GameConfig).bonusPts;
+        session.score += bonusPts;
+      }
+
+      if (correct) {
+        const bonusText = bonusPts > 0 ? ` ⚡ +${bonusPts}` : '';
+        feedbackEl.textContent = `🎉 Correct!${bonusText}`;
+        feedbackEl.setAttribute('aria-label', bonusPts > 0
+          ? `Correct! Speed bonus! ${bonusPts} extra points.`
+          : 'Correct!');
+      } else if (timedOut) {
+        feedbackEl.textContent = `⏰ Time's up! Answer: ${q.answer}`;
+        feedbackEl.removeAttribute('aria-label');
+      } else {
+        feedbackEl.textContent = `😬 Wrong! Answer: ${q.answer}`;
+        feedbackEl.removeAttribute('aria-label');
+      }
+
       document.getElementById('score-display').textContent = `Score: ${session.score}`;
       document.getElementById('score-display').setAttribute('aria-label', `Score: ${session.score}`);
       document.getElementById('streak-indicator').hidden =

@@ -1,6 +1,6 @@
 # Data Model: Math Quiz Game
 
-**Branch**: `001-math-quiz-game` | **Date**: 2026-04-28
+**Branch**: `001-math-quiz-game` | **Date**: 2026-04-28 | **Amended**: 2026-04-28
 **Plan**: [plan.md](./plan.md) | **Research**: [research.md](./research.md)
 
 All state is held in plain JavaScript objects. No external storage schema is required.
@@ -15,31 +15,38 @@ Never mutated during a session.
 
 ```js
 {
-  totalQuestions:  10,          // questions per round
-  timerSeconds:    10,          // seconds allowed per question
-  basePts:         10,          // points for any correct answer
-  streakPts:       15,          // points per correct answer when streak active
-  streakThreshold: 3,           // consecutive correct answers to activate streak
+  totalQuestions:       10,   // questions per round
+  timerSeconds:         15,   // seconds allowed per question
+  timerBonusThreshold:   8,   // correct answers within this many seconds earn bonus pts
+  timerBonusPts:         5,   // bonus points for answering within timerBonusThreshold
+  basePts:              10,   // points for any correct answer
+  streakPts:            15,   // points per correct answer when streak active
+  streakThreshold:       3,   // consecutive correct answers to activate streak
 
   starThresholds: {
     two:   70,   // score >= 70 → 2 stars
-    three: 130,  // score >= 130 → 3 stars (requires ~9 correct with streak)
+    three: 130,  // score >= 130 → 3 stars (achievable with streak + timer bonuses)
   },
 
   operations: ['add', 'sub', 'mul', 'div'],  // all four included in every round
 
+  // Static bounds; ≤ 100 result cap is enforced dynamically in generateQuestion().
+  // bMax for 'add' and aMax for 'mul'/'div' are computed per-question, not stored here.
   numberRanges: {
-    add: { aMin: 1,  aMax: 99, bMin: 1,  bMax: 99  },
-    sub: { aMin: 10, aMax: 99, bMin: 1,  bMax: null },  // bMax = a-1 (ensured at gen time)
-    mul: { aMin: 2,  aMax: 12, bMin: 2,  bMax: 12  },
-    div: { aMin: 4,  aMax: 144, bMin: 2, bMax: 12  },   // a = b * quotient (whole number)
+    add: { aMin: 1,  aMax: 99, bMin: 1,  bMax: null },  // bMax = 100 - a (at gen time)
+    sub: { aMin: 10, aMax: 99, bMin: 1,  bMax: null },   // bMax = a - 1 (ensured at gen time)
+    mul: { aMin: 2,  aMax: 12, bMin: 2,  bMax: 12   },   // aMax capped to floor(100/b) at gen time
+    div: { aMin: 4,  aMax: 100, bMin: 2, bMax: 12   },   // a = b * quotient, quotient <= floor(100/b)
   },
 }
 ```
 
 **Validation rules**:
-- `sub`: `b < a` always enforced so the result is a positive integer
-- `div`: `a` is computed as `quotient * b` where `quotient ∈ [1, 12]` and `b ∈ [2, 12]`
+- All operations: result (answer) MUST be ≤ 100
+- `add`: `b` is picked from [1, 100 − a] so `a + b ≤ 100` always holds
+- `sub`: `b < a` always enforced so the result is a positive integer; max result is 98
+- `mul`: `a` is picked from [2, floor(100 / b)] so `a × b ≤ 100` always holds
+- `div`: `a` is computed as `quotient * b` where `quotient ∈ [1, floor(100 / b)]` and `b ∈ [2, 12]`
 
 ---
 
@@ -65,6 +72,7 @@ Immutable after creation.
 - `choices` contains no duplicates
 - `choices` includes `answer`
 - All `choices` are positive integers
+- `answer ≤ 100`
 
 ---
 
@@ -75,12 +83,12 @@ Never persisted (lives only for the duration of the round).
 
 ```js
 {
-  score:         number,    // 0..200 (10 questions × max 15pts + rounding overhead)
+  score:         number,    // 0..200 (10 questions × max 20pts: 15 streak + 5 timer bonus)
   lives:         number,    // 3 → 0; game ends when reaches 0
   streak:        number,    // consecutive correct answers; resets to 0 on wrong
   questionIndex: number,    // 0-based; current question (0–9)
   questions:     Question[],// full array of 10 pre-generated questions
-  timerTicks:    number,    // 0–100 (tenths of seconds); counts down from 100
+  timerTicks:    number,    // 0–150 (tenths of seconds); counts down from 150 (15 s)
   timerHandle:   number|null, // setInterval handle; cleared on question end
   phase:         string,    // 'question' | 'feedback' | 'done'
 }

@@ -1,6 +1,6 @@
 # Quickstart: Math Quiz Game
 
-**Branch**: `001-math-quiz-game`
+**Branch**: `001-math-quiz-game` | **Amended**: 2026-04-28
 
 ## Prerequisites
 
@@ -52,8 +52,12 @@ Expected output (all green):
 ▶ generateQuestion
   ✔ returns 4 unique choices (Xms)
   ✔ correct answer is among choices (Xms)
+  ✔ all answers are ≤ 100 (Xms)
   ✔ division produces whole-number answer (Xms)
   ✔ subtraction result is positive (Xms)
+▶ applyTimerBonus
+  ✔ awards bonus pts when ticks > 70 (Xms)
+  ✔ awards 0 pts when ticks <= 70 (Xms)
 ▶ updateStreak
   ✔ activates at threshold (Xms)
   ✔ resets on wrong answer (Xms)
