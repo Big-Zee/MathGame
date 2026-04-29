@@ -1,3 +1,30 @@
+export const PracticeRanges = {
+  easy: {
+    add: { aMin: 1,  aMax: 10,  bMin: 1, bMax: 10  },
+    sub: { aMin: 2,  aMax: 20,  bMin: 1, bMax: 9   },
+    mul: { aMin: 2,  aMax: 10,  bMin: 2, bMax: 5   },
+    div: { aMin: 4,  aMax: 50,  bMin: 2, bMax: 5   },
+  },
+  medium: {
+    add: { aMin: 1,  aMax: 50,  bMin: 1, bMax: 49  },
+    sub: { aMin: 5,  aMax: 50,  bMin: 1, bMax: 44  },
+    mul: { aMin: 2,  aMax: 10,  bMin: 2, bMax: 10  },
+    div: { aMin: 4,  aMax: 100, bMin: 2, bMax: 10  },
+  },
+  hard: {
+    add: { aMin: 1,  aMax: 99,  bMin: 1, bMax: null },
+    sub: { aMin: 10, aMax: 99,  bMin: 1, bMax: null },
+    mul: { aMin: 2,  aMax: 12,  bMin: 2, bMax: 12  },
+    div: { aMin: 4,  aMax: 100, bMin: 2, bMax: 12  },
+  },
+};
+
+export const ENCOURAGING_MESSAGES = [
+  '🎉 Brilliant!', '⭐ Excellent!', '🌟 You got it!',
+  '💪 Amazing!',   '🔥 Correct!',  '👏 Well done!',
+  '✅ Perfect!',   '🚀 Spot on!',
+];
+
 export const GameConfig = {
   totalQuestions: 10,
   timerSeconds: 15,
@@ -15,6 +42,21 @@ export const GameConfig = {
     div: { aMin: 4,  aMax: 100, bMin: 2, bMax: 12 },
   },
 };
+
+export function getPracticeConfig(operation, difficulty) {
+  return {
+    ...GameConfig,
+    numberRanges: PracticeRanges[difficulty],
+  };
+}
+
+export function getAccuracyTier(totalAnswered, totalCorrect) {
+  const pct = totalAnswered === 0 ? 0 : Math.round(totalCorrect / totalAnswered * 100);
+  if (pct >= 90) return 'master';
+  if (pct >= 70) return 'amazing';
+  if (pct >= 50) return 'good';
+  return 'keep-going';
+}
 
 function randInt(min, max) {
   return Math.floor(Math.random() * (max - min + 1)) + min;
@@ -63,12 +105,12 @@ export function generateQuestion(operation, config, id) {
   switch (operation) {
     case 'add':
       a = randInt(r.aMin, r.aMax);
-      b = randInt(r.bMin, 100 - a);
+      b = randInt(r.bMin, Math.min(r.bMax ?? Infinity, 100 - a));
       answer = a + b;
       break;
     case 'sub':
       a = randInt(r.aMin, r.aMax);
-      b = randInt(r.bMin, a - 1);
+      b = randInt(r.bMin, Math.min(r.bMax ?? Infinity, a - 1));
       answer = a - b;
       break;
     case 'mul':
@@ -78,7 +120,8 @@ export function generateQuestion(operation, config, id) {
       break;
     case 'div': {
       b = randInt(r.bMin, r.bMax);
-      const quotient = randInt(1, Math.floor(100 / b));
+      const maxQuotient = Math.min(Math.floor(100 / b), Math.floor(r.aMax / b));
+      const quotient = randInt(1, maxQuotient);
       a = b * quotient;
       answer = quotient;
       break;
