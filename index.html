@@ -179,6 +179,199 @@
     .result-new-highscore  { text-align: center; color: #B45309; font-weight: 700; margin-bottom: 16px; }
     #btn-play-again { margin-top: 16px; }
 
+    /* ── PRACTICE MODE ── */
+    .btn-secondary {
+      background: #F1F5F9;
+      color: var(--clr-text);
+      border: 2px solid #CBD5E1;
+    }
+    .btn-secondary:hover { background: #E2E8F0; }
+
+    .btn-link {
+      background: transparent;
+      color: var(--clr-muted);
+      border: none;
+      font-weight: 600;
+      text-decoration: underline;
+      cursor: pointer;
+      font-size: 1rem;
+      padding: 8px 0;
+      min-height: 44px;
+    }
+    .btn-link:focus-visible {
+      outline: 3px solid var(--clr-primary);
+      outline-offset: 3px;
+    }
+
+    .btn-stop {
+      background: #FEE2E2;
+      color: var(--clr-wrong);
+      border: 2px solid #FECACA;
+      border-radius: var(--radius);
+      padding: 8px 16px;
+      font-size: 0.95rem;
+      font-weight: 700;
+      cursor: pointer;
+      min-height: 44px;
+      white-space: nowrap;
+    }
+    .btn-stop:hover { background: #FECACA; }
+    .btn-stop:focus-visible {
+      outline: 3px solid var(--clr-wrong);
+      outline-offset: 3px;
+    }
+
+    .op-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      margin-top: 16px;
+    }
+
+    .btn-op {
+      background: #EFF6FF;
+      color: var(--clr-primary);
+      border: 2px solid #BFDBFE;
+      border-radius: var(--radius);
+      font-size: 1rem;
+      font-weight: 700;
+      padding: 14px 8px;
+      min-height: 64px;
+      cursor: pointer;
+      text-align: center;
+    }
+    .btn-op:hover { background: #DBEAFE; border-color: var(--clr-primary); }
+    .btn-op:focus-visible {
+      outline: 3px solid var(--clr-primary);
+      outline-offset: 3px;
+    }
+
+    .diff-grid {
+      display: grid;
+      gap: 12px;
+      margin-top: 12px;
+      margin-bottom: 16px;
+    }
+
+    .practice-op-reminder {
+      text-align: center;
+      font-weight: 700;
+      color: var(--clr-primary);
+      margin-bottom: 8px;
+      font-size: 1.1rem;
+    }
+
+    .practice-session-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 14px;
+      gap: 12px;
+    }
+
+    #practice-mode-label {
+      font-weight: 700;
+      font-size: 1rem;
+      color: var(--clr-primary);
+    }
+
+    .practice-tally {
+      display: flex;
+      gap: 16px;
+      justify-content: center;
+      font-size: 0.95rem;
+      font-weight: 600;
+      color: var(--clr-muted);
+      margin-bottom: 10px;
+      background: #F8FAFC;
+      border-radius: 10px;
+      padding: 8px 16px;
+    }
+
+    #practice-streak {
+      color: #C2410C;
+    }
+
+    .practice-input-area {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      margin: 16px 0 12px;
+    }
+
+    .practice-input-area label {
+      font-size: 0.9rem;
+      font-weight: 600;
+      color: var(--clr-muted);
+    }
+
+    #practice-input {
+      width: 100%;
+      padding: 14px 16px;
+      font-size: 1.4rem;
+      font-weight: 700;
+      text-align: center;
+      border: 2px solid #CBD5E1;
+      border-radius: var(--radius);
+      color: var(--clr-text);
+      background: #fff;
+      min-height: 56px;
+    }
+    #practice-input:focus {
+      outline: 3px solid var(--clr-primary);
+      outline-offset: 2px;
+      border-color: var(--clr-primary);
+    }
+    #practice-input[disabled] {
+      background: #F8FAFC;
+      color: var(--clr-muted);
+      cursor: not-allowed;
+    }
+    #practice-input.practice-correct-highlight {
+      border-color: var(--clr-correct);
+      background: #DCFCE7;
+      color: var(--clr-correct);
+    }
+
+    #practice-feedback {
+      min-height: 2rem;
+      text-align: center;
+      font-size: 1.15rem;
+      font-weight: 700;
+      color: var(--clr-text);
+      margin-bottom: 12px;
+      padding: 0 4px;
+    }
+
+    #btn-next-question { margin-bottom: 4px; }
+
+    .summary-stats {
+      background: #F8FAFC;
+      border-radius: var(--radius);
+      padding: 16px 20px;
+      margin: 16px 0;
+    }
+
+    .summary-stats p {
+      padding: 6px 0;
+      font-size: 1rem;
+      border-bottom: 1px solid #E2E8F0;
+    }
+    .summary-stats p:last-child { border-bottom: none; }
+
+    .summary-message {
+      text-align: center;
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: var(--clr-primary);
+      margin-bottom: 20px;
+      padding: 12px;
+      background: #EFF6FF;
+      border-radius: var(--radius);
+    }
+
+    #btn-practise-again { margin-bottom: 10px; }
+
     /* ── MOTION: transitions only for users who want them ── */
     @media (prefers-reduced-motion: no-preference) {
       .timer-bar { transition: width 0.1s linear; }
@@ -205,7 +398,8 @@
         <li>Answer streaks earn <strong>bonus points</strong> 🔥</li>
       </ul>
       <div id="start-highscore" class="highscore-display" aria-live="polite"></div>
-      <button class="btn btn-primary" id="btn-play">▶ Play!</button>
+      <button class="btn btn-primary" id="btn-play" style="margin-bottom:10px">▶ Play!</button>
+      <button class="btn btn-secondary" id="btn-practice">📚 Practice Mode</button>
     </section>
 
     <!-- ── GAME SCREEN ── -->
@@ -255,12 +449,73 @@
       <button class="btn btn-primary" id="btn-play-again">▶ Play Again</button>
     </section>
 
+    <!-- ── PRACTICE: OPERATION SELECTOR ── -->
+    <section id="screen-practice-op" hidden>
+      <h2>Practice Mode</h2>
+      <p class="subtitle">Choose an operation to practise</p>
+      <div class="op-grid">
+        <button class="btn btn-op" id="btn-op-add">➕ Addition</button>
+        <button class="btn btn-op" id="btn-op-sub">➖ Subtraction</button>
+        <button class="btn btn-op" id="btn-op-mul">✖️ Multiplication</button>
+        <button class="btn btn-op" id="btn-op-div">➗ Division</button>
+      </div>
+    </section>
+
+    <!-- ── PRACTICE: DIFFICULTY SELECTOR ── -->
+    <section id="screen-practice-diff" hidden>
+      <h2>Choose Difficulty</h2>
+      <p class="practice-op-reminder" id="practice-op-reminder"></p>
+      <div class="diff-grid">
+        <button class="btn btn-primary" id="btn-diff-easy">Easy</button>
+        <button class="btn btn-primary" id="btn-diff-medium">Medium</button>
+        <button class="btn btn-primary" id="btn-diff-hard">Hard</button>
+      </div>
+      <button class="btn btn-link" id="btn-diff-back">← Back</button>
+    </section>
+
+    <!-- ── PRACTICE: SESSION ── -->
+    <section id="screen-practice-session" hidden>
+      <header class="practice-session-header">
+        <span id="practice-mode-label" aria-live="off"></span>
+        <button class="btn-stop" id="btn-stop-practice">Stop Practising</button>
+      </header>
+      <div class="practice-tally" role="status" aria-live="polite">
+        <span id="practice-answered">Answered: 0</span>
+        <span id="practice-correct">Correct: 0</span>
+        <span id="practice-streak" hidden>🔥 0</span>
+      </div>
+      <div id="practice-question" class="question-text" aria-live="polite"></div>
+      <div class="practice-input-area">
+        <label for="practice-input">Your answer</label>
+        <input type="number" inputmode="numeric" id="practice-input"
+               autocomplete="off" min="0" max="100" />
+        <button class="btn btn-primary" id="btn-check">Check</button>
+      </div>
+      <div id="practice-feedback" aria-live="polite" aria-atomic="true"></div>
+      <button class="btn btn-primary" id="btn-next-question" hidden>Next Question →</button>
+    </section>
+
+    <!-- ── PRACTICE: SUMMARY ── -->
+    <section id="screen-practice-summary" hidden>
+      <h2>Practice Complete! 🎉</h2>
+      <div class="summary-stats">
+        <p id="summary-answered"></p>
+        <p id="summary-correct"></p>
+        <p id="summary-accuracy"></p>
+        <p id="summary-streak"></p>
+      </div>
+      <p id="summary-message" class="summary-message" aria-live="off"></p>
+      <button class="btn btn-primary" id="btn-practise-again" style="margin-bottom:10px">Practise Again</button>
+      <button class="btn btn-secondary" id="btn-summary-home">Back to Start</button>
+    </section>
+
   </main>
 
   <script type="module">
     import {
       GameConfig,
       generateRound,
+      generateQuestion,
       evaluateAnswer,
       calculateStars,
       updateStreak,
@@ -268,11 +523,16 @@
       applyTimerBonus,
       getHighScore,
       setHighScore,
+      getPracticeConfig,
+      getAccuracyTier,
+      ENCOURAGING_MESSAGES,
     } from './js/math-engine.js';
 
     // ── STATE ──────────────────────────────────────────────────────────────
 
     let session = null;
+    let practiceSession = null;
+    let practiceOperation = null;
 
     function newSession() {
       return {
@@ -501,6 +761,215 @@
     if (hs > 0) {
       document.getElementById('start-highscore').textContent = `Best: ${hs} pts`;
     }
+
+    // ── PRACTICE MODE ──────────────────────────────────────────────────────
+
+    const OP_LABELS = {
+      add: '➕ Addition',
+      sub: '➖ Subtraction',
+      mul: '✖️ Multiplication',
+      div: '➗ Division',
+    };
+    const DIFF_LABELS = { easy: 'Easy', medium: 'Medium', hard: 'Hard' };
+    const ACCURACY_MESSAGES = {
+      master:     "You're a Math Blaster master! 🏆",
+      amazing:    'Amazing work, keep it up! 🌟',
+      good:       "Good effort! A little more practice and you'll ace it! 💪",
+      'keep-going': 'Keep going, every question makes you smarter! 🧠',
+    };
+
+    function practiceKey(q) {
+      return `${q.a}-${q.operation}-${q.b}`;
+    }
+
+    function nextUniqueQuestion(operation, config, seenKeys) {
+      for (let attempt = 0; attempt < 50; attempt++) {
+        const q = generateQuestion(operation, config, 0);
+        const key = practiceKey(q);
+        if (!seenKeys.has(key)) {
+          seenKeys.add(key);
+          return q;
+        }
+      }
+      // Pool exhausted — silent repeat (generate without dedup)
+      return generateQuestion(operation, config, 0);
+    }
+
+    function newPracticeSession(operation, difficulty) {
+      const config = getPracticeConfig(operation, difficulty);
+      const seenKeys = new Set();
+      const firstQuestion = nextUniqueQuestion(operation, config, seenKeys);
+
+      practiceSession = {
+        operation,
+        difficulty,
+        config,
+        seenKeys,
+        totalAnswered: 0,
+        totalCorrect: 0,
+        currentStreak: 0,
+        bestStreak: 0,
+        currentQuestion: firstQuestion,
+      };
+
+      document.getElementById('practice-mode-label').textContent =
+        `${OP_LABELS[operation]} — ${DIFF_LABELS[difficulty]}`;
+      document.getElementById('practice-op-reminder').textContent =
+        OP_LABELS[operation];
+      renderPracticeQuestion();
+      updatePracticeTally();
+    }
+
+    function renderPracticeQuestion() {
+      const q = practiceSession.currentQuestion;
+      document.getElementById('practice-question').textContent =
+        `${q.a} ${q.symbol} ${q.b} = ?`;
+      document.getElementById('practice-feedback').textContent = '';
+      const input = document.getElementById('practice-input');
+      input.value = '';
+      input.disabled = false;
+      input.classList.remove('practice-correct-highlight');
+      document.getElementById('btn-check').disabled = false;
+      document.getElementById('btn-next-question').hidden = true;
+    }
+
+    function updatePracticeTally() {
+      document.getElementById('practice-answered').textContent =
+        `Answered: ${practiceSession.totalAnswered}`;
+      document.getElementById('practice-correct').textContent =
+        `Correct: ${practiceSession.totalCorrect}`;
+      const streakEl = document.getElementById('practice-streak');
+      streakEl.textContent = `🔥 ${practiceSession.currentStreak}`;
+      // Hide streak at exactly 0 — NOT at < streakThreshold (main game rule does not apply here)
+      streakEl.hidden = practiceSession.currentStreak === 0;
+    }
+
+    function submitPracticeAnswer() {
+      const input = document.getElementById('practice-input');
+      const parsed = parseInt(input.value, 10);
+      const feedbackEl = document.getElementById('practice-feedback');
+
+      const { correct } = evaluateAnswer(practiceSession.currentQuestion, parsed);
+
+      practiceSession.totalAnswered++;
+
+      if (correct) {
+        practiceSession.totalCorrect++;
+        const { newStreak } = updateStreak(practiceSession.currentStreak, true, GameConfig);
+        practiceSession.currentStreak = newStreak;
+        if (practiceSession.currentStreak > practiceSession.bestStreak) {
+          practiceSession.bestStreak = practiceSession.currentStreak;
+        }
+        input.classList.add('practice-correct-highlight');
+        const msg = ENCOURAGING_MESSAGES[
+          Math.floor(Math.random() * ENCOURAGING_MESSAGES.length)
+        ];
+        feedbackEl.textContent = `${msg} Streak: ${practiceSession.currentStreak} 🔥`;
+      } else {
+        practiceSession.currentStreak = 0;
+        feedbackEl.textContent =
+          `Not quite! The answer was ${practiceSession.currentQuestion.answer}. You've got this! 💪`;
+      }
+
+      input.disabled = true;
+      document.getElementById('btn-check').disabled = true;
+      document.getElementById('btn-next-question').hidden = false;
+      document.getElementById('btn-next-question').focus();
+
+      updatePracticeTally();
+    }
+
+    function nextPracticeQuestion() {
+      practiceSession.currentQuestion = nextUniqueQuestion(
+        practiceSession.operation,
+        practiceSession.config,
+        practiceSession.seenKeys,
+      );
+      renderPracticeQuestion();
+      document.getElementById('practice-input').focus();
+    }
+
+    function stopPractising() {
+      const { totalAnswered, totalCorrect, bestStreak } = practiceSession;
+      const accuracyPct = totalAnswered === 0
+        ? 0
+        : Math.round(totalCorrect / totalAnswered * 100);
+      const tier = getAccuracyTier(totalAnswered, totalCorrect);
+
+      document.getElementById('summary-answered').textContent =
+        `Questions: ${totalAnswered}`;
+      document.getElementById('summary-correct').textContent =
+        `Correct: ${totalCorrect} out of ${totalAnswered}`;
+      document.getElementById('summary-accuracy').textContent =
+        `Accuracy: ${accuracyPct}%`;
+      document.getElementById('summary-streak').textContent =
+        `Best streak: ${bestStreak} 🔥`;
+      document.getElementById('summary-message').textContent =
+        ACCURACY_MESSAGES[tier];
+
+      showScreen('screen-practice-summary');
+      document.getElementById('btn-practise-again').focus();
+    }
+
+    // ── PRACTICE EVENT LISTENERS ───────────────────────────────────────────
+
+    document.getElementById('btn-practice').addEventListener('click', () => {
+      showScreen('screen-practice-op');
+      document.getElementById('btn-op-add').focus();
+    });
+
+    for (const [id, op] of [
+      ['btn-op-add', 'add'],
+      ['btn-op-sub', 'sub'],
+      ['btn-op-mul', 'mul'],
+      ['btn-op-div', 'div'],
+    ]) {
+      document.getElementById(id).addEventListener('click', () => {
+        practiceOperation = op;
+        document.getElementById('practice-op-reminder').textContent = OP_LABELS[op];
+        showScreen('screen-practice-diff');
+        document.getElementById('btn-diff-easy').focus();
+      });
+    }
+
+    document.getElementById('btn-diff-back').addEventListener('click', () => {
+      showScreen('screen-practice-op');
+      document.getElementById('btn-op-add').focus();
+    });
+
+    for (const [id, diff] of [
+      ['btn-diff-easy', 'easy'],
+      ['btn-diff-medium', 'medium'],
+      ['btn-diff-hard', 'hard'],
+    ]) {
+      document.getElementById(id).addEventListener('click', () => {
+        newPracticeSession(practiceOperation, diff);
+        showScreen('screen-practice-session');
+        document.getElementById('practice-input').focus();
+      });
+    }
+
+    document.getElementById('btn-check').addEventListener('click', submitPracticeAnswer);
+
+    document.getElementById('practice-input').addEventListener('keydown', e => {
+      if (e.key === 'Enter') submitPracticeAnswer();
+    });
+
+    document.getElementById('btn-next-question').addEventListener('click', nextPracticeQuestion);
+
+    document.getElementById('btn-stop-practice').addEventListener('click', stopPractising);
+
+    document.getElementById('btn-practise-again').addEventListener('click', () => {
+      const { operation, difficulty } = practiceSession;
+      newPracticeSession(operation, difficulty);
+      showScreen('screen-practice-session');
+      document.getElementById('practice-input').focus();
+    });
+
+    document.getElementById('btn-summary-home').addEventListener('click', () => {
+      practiceSession = null;
+      showScreen('screen-start');
+    });
   </script>
 </body>
 </html>
