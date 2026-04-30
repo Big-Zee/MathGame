@@ -34,7 +34,7 @@ Integration scenarios for manual smoke testing and acceptance validation.
 5. Note current score and lives
 6. Click "Keep playing ▶️"
 7. Verify overlay is gone; game is on same question with same score and lives
-8. Verify focus returns to `#btn-stop-game`
+8. Verify focus moves to the first answer-choice button (not `#btn-stop-game`)
 
 **Expected result**: Overlay dismisses cleanly; game state unchanged.
 

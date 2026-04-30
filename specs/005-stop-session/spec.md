@@ -116,7 +116,7 @@ The score earned in a partial session is saved to the high score on the same ter
 - **Stop on question 10** (last question, before submitting): Early-stop summary shows 9 or fewer answers.
 - **0 questions answered**: Show all-zero summary, special message, only "🏠 Main Menu" — no Play Again, no score save.
 - **Escape key dismissal**: Pressing Escape while the confirmation overlay is visible acts as "Keep playing ▶️".
-- **Focus management**: When the confirmation overlay appears, focus moves to the "Keep playing ▶️" button (safer default). When dismissed, focus returns to the ⛔ Stop button.
+- **Focus management**: When the confirmation overlay appears, focus moves to the "Keep playing ▶️" button (safer default). When dismissed in the **question phase** (timer was running, choice buttons are visible), focus moves to the first `.choice-btn` so the child can answer immediately. When dismissed in the **feedback phase** (timer already stopped, choices disabled), focus returns to the ⛔ Stop button.
 - **Double-tap prevention**: Tapping ⛔ Stop while the confirmation overlay is already visible has no effect.
 
 ---
@@ -177,3 +177,4 @@ The score earned in a partial session is saved to the high score on the same ter
 ### Session 2026-04-30
 
 - Q: What does "leaderboard" mean in the context of the current codebase? → A: The game currently has only a single `localStorage` high score (no multi-entry leaderboard). "Leaderboard eligibility" is interpreted as: early-stop scores are saved on the same terms as completed-game scores (highest score wins). A `localStorage` flag (`mathgame_highscore_early`) marks the saved score as partial. A full multi-entry leaderboard is out of scope for this feature.
+- Q: After "Keep Playing ▶️" dismisses the overlay, where does focus go? → A: In the question phase (timer was running, choice buttons visible), focus moves to the first `.choice-btn` so the child can answer immediately without an extra click. In the feedback phase (timer already stopped, choices disabled), focus returns to `#btn-stop-game`.
