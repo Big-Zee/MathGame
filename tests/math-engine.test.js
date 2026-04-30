@@ -14,6 +14,9 @@ import {
   ENCOURAGING_MESSAGES,
   getPracticeConfig,
   getAccuracyTier,
+  TIMER_OPTIONS,
+  getGameConfigForTimer,
+  getTimerPreference,
 } from '../js/math-engine.js';
 
 // ── T006: buildChoices + generateQuestion invariants ──────────────────────
@@ -294,6 +297,103 @@ describe('generateQuestion div aMax constraint', () => {
       assert.ok(q.a <= cfg.numberRanges.div.aMax,
         `dividend a=${q.a} exceeds aMax=${cfg.numberRanges.div.aMax}`);
     }
+  });
+});
+
+// ── Adjustable Timer: TIMER_OPTIONS ──────────────────────────────────────
+
+describe('TIMER_OPTIONS', () => {
+  it('has exactly 6 entries', () => {
+    assert.equal(TIMER_OPTIONS.length, 6);
+  });
+
+  it('index 2 has seconds === 15 (the default)', () => {
+    assert.equal(TIMER_OPTIONS[2].seconds, 15);
+  });
+
+  it('entries are ordered ascending by seconds', () => {
+    for (let i = 1; i < TIMER_OPTIONS.length; i++) {
+      assert.ok(
+        TIMER_OPTIONS[i].seconds > TIMER_OPTIONS[i - 1].seconds,
+        `index ${i}: ${TIMER_OPTIONS[i].seconds} not > ${TIMER_OPTIONS[i - 1].seconds}`,
+      );
+    }
+  });
+
+  it('all entries have non-empty label strings', () => {
+    for (const opt of TIMER_OPTIONS) {
+      assert.equal(typeof opt.label, 'string');
+      assert.ok(opt.label.length > 0, `empty label at seconds=${opt.seconds}`);
+    }
+  });
+});
+
+// ── Adjustable Timer: getGameConfigForTimer ───────────────────────────────
+
+describe('getGameConfigForTimer', () => {
+  it('returns config with timerSeconds matching input', () => {
+    for (const opt of TIMER_OPTIONS) {
+      const cfg = getGameConfigForTimer(opt.seconds);
+      assert.equal(cfg.timerSeconds, opt.seconds);
+    }
+  });
+
+  it('timerBonusThreshold === Math.floor(seconds * 0.5) for all 6 values', () => {
+    for (const opt of TIMER_OPTIONS) {
+      const cfg = getGameConfigForTimer(opt.seconds);
+      assert.equal(cfg.timerBonusThreshold, Math.floor(opt.seconds * 0.5));
+    }
+  });
+
+  it('all other GameConfig fields are unchanged', () => {
+    const cfg = getGameConfigForTimer(10);
+    assert.equal(cfg.totalQuestions,      GameConfig.totalQuestions);
+    assert.equal(cfg.basePts,             GameConfig.basePts);
+    assert.equal(cfg.streakPts,           GameConfig.streakPts);
+    assert.equal(cfg.streakThreshold,     GameConfig.streakThreshold);
+    assert.deepEqual(cfg.starThresholds,  GameConfig.starThresholds);
+    assert.deepEqual(cfg.operations,      GameConfig.operations);
+    assert.deepEqual(cfg.numberRanges,    GameConfig.numberRanges);
+  });
+
+  it('applyTimerBonus works correctly with getGameConfigForTimer(5)', () => {
+    const cfg = getGameConfigForTimer(5); // threshold = 2s → ticks boundary = (5-2)*10 = 30
+    assert.equal(applyTimerBonus(31, cfg).bonusPts, GameConfig.timerBonusPts); // > 30 → bonus
+    assert.equal(applyTimerBonus(30, cfg).bonusPts, 0);                        // = 30 → no bonus
+  });
+
+  it('applyTimerBonus works correctly with getGameConfigForTimer(30)', () => {
+    const cfg = getGameConfigForTimer(30); // threshold = 15s → ticks boundary = (30-15)*10 = 150
+    assert.equal(applyTimerBonus(151, cfg).bonusPts, GameConfig.timerBonusPts);
+    assert.equal(applyTimerBonus(150, cfg).bonusPts, 0);
+  });
+});
+
+// ── Adjustable Timer: getTimerPreference ─────────────────────────────────
+
+describe('getTimerPreference', () => {
+  it('returns 15 when localStorage is empty', () => {
+    globalThis.localStorage = { getItem: () => null };
+    assert.equal(getTimerPreference(), 15);
+    delete globalThis.localStorage;
+  });
+
+  it('returns saved value when a valid seconds value is stored', () => {
+    globalThis.localStorage = { getItem: () => '20' };
+    assert.equal(getTimerPreference(), 20);
+    delete globalThis.localStorage;
+  });
+
+  it('returns 15 for an invalid stored value (not in TIMER_OPTIONS)', () => {
+    globalThis.localStorage = { getItem: () => '99' };
+    assert.equal(getTimerPreference(), 15);
+    delete globalThis.localStorage;
+  });
+
+  it('returns 15 for a non-numeric stored value', () => {
+    globalThis.localStorage = { getItem: () => 'abc' };
+    assert.equal(getTimerPreference(), 15);
+    delete globalThis.localStorage;
   });
 });
 
