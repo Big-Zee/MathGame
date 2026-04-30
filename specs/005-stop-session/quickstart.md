@@ -73,7 +73,7 @@ Integration scenarios for manual smoke testing and acceptance validation.
 2. While in feedback phase (before next question), click ⛔ Stop
 3. Wait 2 seconds
 4. Click "Keep playing ▶️"
-5. Verify game advances to question 2 normally; countdown starts fresh for question 2
+5. Verify game is now on question 2 with a full countdown (the `pendingAdvance` timeout advanced the round while the overlay was open, so a full timer for the new question is correct)
 
 **Expected result**: No double-start; game flow unaffected.
 

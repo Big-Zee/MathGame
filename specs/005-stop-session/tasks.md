@@ -81,7 +81,7 @@
 - [X] T009 [US2] Add `<div id="stop-confirm-overlay" class="stop-overlay" hidden role="dialog" aria-modal="true" aria-labelledby="stop-confirm-title">` with inner card containing `#stop-confirm-title`, subtitle, `#btn-keep-playing`, and `#btn-confirm-stop` as the **last child** of `<section id="screen-game">` in `index.html`
 - [X] T010 [US2] Add `let stopOverlayActive = false;` module-level state in the `<script type="module">` block of `index.html`
 - [X] T011 [US2] Add `showStopOverlay()` function to `index.html` script: double-tap guard → set `stopOverlayActive = true` → call `stopTimer()` → unhide `#stop-confirm-overlay` → focus `#btn-keep-playing`
-- [X] T012 [US2] Add `hideStopOverlay()` function to `index.html` script: set `stopOverlayActive = false` → hide `#stop-confirm-overlay` → focus `#btn-stop-game` → if `session.phase === 'question'` call `resumeTimer()` (stub call — `resumeTimer` implemented in Phase 5)
+- [X] T012 [US2] Add `hideStopOverlay()` function to `index.html` script: set `stopOverlayActive = false` → hide `#stop-confirm-overlay` → if `session.phase === 'question'`: call `resumeTimer()` then focus first `.choice-btn` in `#choices-container`; else focus `#btn-stop-game` (stub call — `resumeTimer` implemented in Phase 5)
 - [X] T013 [US2] Add event listener: `document.getElementById('btn-stop-game').addEventListener('click', showStopOverlay)` in `index.html` script
 - [X] T014 [US2] Add event listener: `document.getElementById('btn-keep-playing').addEventListener('click', hideStopOverlay)` in `index.html` script
 - [X] T015 [US2] Add Escape key listener: `document.addEventListener('keydown', e => { if (e.key === 'Escape' && stopOverlayActive) hideStopOverlay(); })` in `index.html` script
@@ -160,8 +160,8 @@
 **Purpose**: Verify the complete feature end-to-end, confirm regressions are absent, check accessibility.
 
 - [X] T033 Run `node --test tests/math-engine.test.js` — confirm all tests pass (no regressions) — 82/82 pass
-- [ ] T034 Open `index.html` in a browser and run all 10 Quickstart scenarios from `quickstart.md` — mark each passing
-- [ ] T035 Run all 6 Regression Checks from `quickstart.md` — verify normal game flow, Play Again, timer selector, Practice Mode, high score without 🛑, keyboard navigation are unaffected
+- [X] T034 Open `index.html` in a browser and run all 10 Quickstart scenarios from `quickstart.md` — mark each passing
+- [X] T035 Run all 6 Regression Checks from `quickstart.md` — verify normal game flow, Play Again, timer selector, Practice Mode, high score without 🛑, keyboard navigation are unaffected
 - [X] T036 Accessibility spot-check: all 18 structural/ARIA checks pass — `role="dialog"` `aria-modal="true"` `aria-labelledby="stop-confirm-title"` on overlay; `role="img"` + `aria-label` on stars; `#btn-stop-game` min-height 44px; focus targets wired in JS; Escape key listener present
 
 **Checkpoint**: All Quickstart scenarios pass, all regression checks pass, accessibility attributes verified.
