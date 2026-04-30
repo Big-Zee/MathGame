@@ -34,7 +34,7 @@ Integration scenarios for manual smoke testing and acceptance validation.
 5. Note current score and lives
 6. Click "Keep playing ▶️"
 7. Verify overlay is gone; game is on same question with same score and lives
-8. Verify focus returns to `#btn-stop-game`
+8. Verify focus moves to the first answer-choice button (not `#btn-stop-game`)
 
 **Expected result**: Overlay dismisses cleanly; game state unchanged.
 
@@ -73,7 +73,7 @@ Integration scenarios for manual smoke testing and acceptance validation.
 2. While in feedback phase (before next question), click ⛔ Stop
 3. Wait 2 seconds
 4. Click "Keep playing ▶️"
-5. Verify game advances to question 2 normally; countdown starts fresh for question 2
+5. Verify game is now on question 2 with a full countdown (the `pendingAdvance` timeout advanced the round while the overlay was open, so a full timer for the new question is correct)
 
 **Expected result**: No double-start; game flow unaffected.
 

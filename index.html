@@ -463,6 +463,9 @@
       justify-content: center;
       z-index: 10;
     }
+    /* Class specificity (0,1,0) would override UA [hidden]{display:none}; this
+       rule (0,2,0) restores correct hiding when the hidden attribute is present. */
+    .stop-overlay[hidden] { display: none; }
 
     .stop-overlay-card {
       background: var(--clr-card);
@@ -777,6 +780,7 @@
     }
 
     function resumeTimer() {
+      stopTimer();
       updateTimerBar();
       session.timerHandle = setInterval(() => {
         session.timerTicks--;
@@ -950,6 +954,7 @@
 
     function startGame(timerOption) {
       stopOverlayActive = false;
+      document.getElementById('stop-confirm-overlay').hidden = true;
       const cfg = getGameConfigForTimer(timerOption.seconds);
       session = newSession(cfg);
       document.getElementById('timer-hud-label').textContent = `⏱️ ${timerOption.seconds}s`;
@@ -988,11 +993,17 @@
     function hideStopOverlay() {
       stopOverlayActive = false;
       document.getElementById('stop-confirm-overlay').hidden = true;
-      document.getElementById('btn-stop-game').focus();
-      if (session.phase === 'question') resumeTimer();
+      if (session.phase === 'question') {
+        resumeTimer();
+        const firstChoice = document.querySelector('#choices-container .choice-btn');
+        if (firstChoice) firstChoice.focus();
+      } else {
+        document.getElementById('btn-stop-game').focus();
+      }
     }
 
     function showStopSummary() {
+      stopTimer();
       clearTimeout(session.pendingAdvance);
       clearTimeout(session.pendingGameOver);
 
