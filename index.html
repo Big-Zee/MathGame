@@ -179,6 +179,72 @@
     .result-new-highscore  { text-align: center; color: #B45309; font-weight: 700; margin-bottom: 16px; }
     #btn-play-again { margin-top: 16px; }
 
+    /* ── TIMER SELECTOR ── */
+    .timer-selector { margin-bottom: 16px; }
+
+    .timer-selector-label {
+      display: block;
+      text-align: center;
+      font-weight: 700;
+      font-size: 1rem;
+      margin-bottom: 8px;
+    }
+
+    .timer-selector-controls {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+
+    .btn-timer-nav {
+      min-width: 44px;
+      min-height: 44px;
+      width: 44px;
+      height: 44px;
+      border: 2px solid #CBD5E1;
+      border-radius: var(--radius);
+      background: #F1F5F9;
+      color: var(--clr-text);
+      font-size: 1.2rem;
+      font-weight: 700;
+      cursor: pointer;
+      flex-shrink: 0;
+    }
+    .btn-timer-nav:hover { background: #E2E8F0; border-color: var(--clr-primary); }
+    .btn-timer-nav:focus-visible {
+      outline: 3px solid var(--clr-primary);
+      outline-offset: 3px;
+    }
+
+    .timer-display {
+      flex: 1;
+      text-align: center;
+    }
+
+    #timer-value-display {
+      display: block;
+      font-size: 1.35rem;
+      font-weight: 700;
+      color: var(--clr-primary);
+      line-height: 1.2;
+    }
+
+    #timer-label-display {
+      display: block;
+      font-size: 0.9rem;
+      color: var(--clr-muted);
+    }
+
+    #timer-hud-label {
+      display: block;
+      text-align: right;
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: var(--clr-muted);
+      margin-bottom: 4px;
+    }
+
     /* ── PRACTICE MODE ── */
     .btn-secondary {
       background: #F1F5F9;
@@ -392,12 +458,25 @@
       <p class="subtitle">Test your math skills!</p>
       <ul class="rules">
         <li>10 questions per round</li>
-        <li>You have <strong>15 seconds</strong> per question ⏱️</li>
-        <li>Answer within <strong>8 seconds</strong> for a speed bonus ⚡</li>
+        <li>Time per question: <strong>set by the selector below</strong> ⏱️</li>
+        <li>Answer within <strong>half the time</strong> for a speed bonus ⚡</li>
         <li>3 lives ❤️❤️❤️ — don't lose them all!</li>
         <li>Answer streaks earn <strong>bonus points</strong> 🔥</li>
       </ul>
       <div id="start-highscore" class="highscore-display" aria-live="polite"></div>
+
+      <div id="timer-selector" class="timer-selector" role="group" aria-labelledby="timer-selector-label">
+        <p id="timer-selector-label" class="timer-selector-label">⏱️ How much time per question?</p>
+        <div class="timer-selector-controls">
+          <button id="btn-timer-prev" class="btn-timer-nav" aria-label="Previous timer option">◀</button>
+          <div class="timer-display">
+            <span id="timer-value-display" aria-live="polite" aria-atomic="true"></span>
+            <span id="timer-label-display" aria-live="polite" aria-atomic="true"></span>
+          </div>
+          <button id="btn-timer-next" class="btn-timer-nav" aria-label="Next timer option">▶</button>
+        </div>
+      </div>
+
       <button class="btn btn-primary" id="btn-play" style="margin-bottom:10px">▶ Play!</button>
       <button class="btn btn-secondary" id="btn-practice">📚 Practice Mode</button>
     </section>
@@ -421,6 +500,7 @@
 
       <div id="question-text" class="question-text" aria-live="polite"></div>
 
+      <span id="timer-hud-label" aria-hidden="true"></span>
       <div class="timer-container" aria-hidden="true">
         <div
           id="timer-bar"
@@ -526,6 +606,10 @@
       getPracticeConfig,
       getAccuracyTier,
       ENCOURAGING_MESSAGES,
+      TIMER_OPTIONS,
+      getGameConfigForTimer,
+      getTimerPreference,
+      setTimerPreference,
     } from './js/math-engine.js';
 
     // ── STATE ──────────────────────────────────────────────────────────────
@@ -533,8 +617,9 @@
     let session = null;
     let practiceSession = null;
     let practiceOperation = null;
+    let selectedTimerIndex = 2; // index into TIMER_OPTIONS; 2 = 15 s (default)
 
-    function newSession() {
+    function newSession(config) {
       return {
         score: 0,
         lives: 3,
@@ -542,8 +627,9 @@
         questionIndex: 0,
         correctAnswers: 0,
         questionsAnswered: 0,
-        questions: generateRound(GameConfig),
-        timerTicks: GameConfig.timerSeconds * 10,
+        config,
+        questions: generateRound(config),
+        timerTicks: config.timerSeconds * 10,
         timerHandle: null,
         phase: 'question',
       };
@@ -569,7 +655,7 @@
 
     function updateTimerBar() {
       const bar = document.getElementById('timer-bar');
-      const total = GameConfig.timerSeconds * 10;
+      const total = session.config.timerSeconds * 10;
       const pct = Math.max(0, (session.timerTicks / total) * 100);
       bar.style.width = `${pct}%`;
       bar.setAttribute('aria-valuenow', String(Math.round(pct)));
@@ -584,7 +670,7 @@
     }
 
     function startTimer() {
-      session.timerTicks = GameConfig.timerSeconds * 10;
+      session.timerTicks = session.config.timerSeconds * 10;
       updateTimerBar();
       session.timerHandle = setInterval(() => {
         session.timerTicks--;
@@ -665,13 +751,13 @@
 
       // Emoji feedback
       const feedbackEl = document.getElementById('feedback-container');
-      // Score + streak (US3) + timer bonus (FR-016)
-      const { newStreak, pts } = updateStreak(session.streak, correct, GameConfig);
+      // Score + streak + timer bonus
+      const { newStreak, pts } = updateStreak(session.streak, correct, session.config);
       session.streak = newStreak;
       session.score += pts;
       let bonusPts = 0;
       if (correct) {
-        bonusPts = applyTimerBonus(session.timerTicks, GameConfig).bonusPts;
+        bonusPts = applyTimerBonus(session.timerTicks, session.config).bonusPts;
         session.score += bonusPts;
       }
 
@@ -747,14 +833,45 @@
 
     // ── GAME START ─────────────────────────────────────────────────────────
 
-    function startGame() {
-      session = newSession();
+    function startGame(timerOption) {
+      const cfg = getGameConfigForTimer(timerOption.seconds);
+      session = newSession(cfg);
+      document.getElementById('timer-hud-label').textContent = `⏱️ ${timerOption.seconds}s`;
       showScreen('screen-game');
       renderQuestion();
     }
 
-    document.getElementById('btn-play').addEventListener('click', startGame);
-    document.getElementById('btn-play-again').addEventListener('click', startGame);
+    document.getElementById('btn-play').addEventListener('click', () => {
+      setTimerPreference(TIMER_OPTIONS[selectedTimerIndex].seconds);
+      startGame(TIMER_OPTIONS[selectedTimerIndex]);
+    });
+    document.getElementById('btn-play-again').addEventListener('click', () => {
+      startGame(TIMER_OPTIONS[selectedTimerIndex]);
+    });
+
+    // ── TIMER SELECTOR ────────────────────────────────────────────────────
+
+    function renderTimerSelector() {
+      const opt = TIMER_OPTIONS[selectedTimerIndex];
+      document.getElementById('timer-value-display').textContent = `${opt.seconds}s`;
+      document.getElementById('timer-label-display').textContent = opt.label;
+    }
+
+    document.getElementById('btn-timer-prev').addEventListener('click', () => {
+      selectedTimerIndex = (selectedTimerIndex - 1 + TIMER_OPTIONS.length) % TIMER_OPTIONS.length;
+      renderTimerSelector();
+    });
+
+    document.getElementById('btn-timer-next').addEventListener('click', () => {
+      selectedTimerIndex = (selectedTimerIndex + 1) % TIMER_OPTIONS.length;
+      renderTimerSelector();
+    });
+
+    // Initialize timer selector from saved preference (or default index 2 = 15 s)
+    const savedSeconds = getTimerPreference();
+    const foundIdx = TIMER_OPTIONS.findIndex(o => o.seconds === savedSeconds);
+    selectedTimerIndex = foundIdx !== -1 ? foundIdx : 2;
+    renderTimerSelector();
 
     // Show high score on start screen if one exists
     const hs = getHighScore();

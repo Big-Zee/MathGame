@@ -1,3 +1,12 @@
+export const TIMER_OPTIONS = [
+  { seconds: 5,  label: 'Super Speed! ⚡' },
+  { seconds: 10, label: 'Fast! 🚀'         },
+  { seconds: 15, label: 'Normal 🎯'         },
+  { seconds: 20, label: 'Relaxed 😊'        },
+  { seconds: 25, label: 'Easy Going 🌈'     },
+  { seconds: 30, label: 'Take Your Time 🐢' },
+];
+
 export const PracticeRanges = {
   easy: {
     add: { aMin: 1,  aMax: 10,  bMin: 1, bMax: 10  },
@@ -48,6 +57,24 @@ export function getPracticeConfig(operation, difficulty) {
     ...GameConfig,
     numberRanges: PracticeRanges[difficulty],
   };
+}
+
+export function getGameConfigForTimer(seconds) {
+  return {
+    ...GameConfig,
+    timerSeconds:         seconds,
+    timerBonusThreshold:  Math.floor(seconds * 0.5),
+  };
+}
+
+export function getTimerPreference() {
+  const raw = globalThis.localStorage?.getItem('mathblaster_timer_preference');
+  const n = parseInt(raw, 10);
+  return TIMER_OPTIONS.some(o => o.seconds === n) ? n : 15;
+}
+
+export function setTimerPreference(seconds) {
+  globalThis.localStorage?.setItem('mathblaster_timer_preference', String(seconds));
 }
 
 export function getAccuracyTier(totalAnswered, totalCorrect) {
