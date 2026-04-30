@@ -205,3 +205,31 @@ export function getHighScore() {
 export function setHighScore(score) {
   globalThis.localStorage?.setItem('mathgame_highscore', String(score));
 }
+
+export function calculateEarlyStopStars(totalAnswered, totalCorrect) {
+  if (totalAnswered === 0) return 0;
+  const pct = Math.round(totalCorrect / totalAnswered * 100);
+  if (pct >= 80) return 3;
+  if (pct >= 50) return 2;
+  return 1;
+}
+
+export function getEarlyStopMessage(totalAnswered, totalCorrect) {
+  if (totalAnswered === 0) return "You didn't answer any questions yet — give it a go! 😊";
+  const pct = Math.round(totalCorrect / totalAnswered * 100);
+  if (pct >= 80) return 'Brilliant effort, you were on fire! 🔥';
+  if (pct >= 50) return 'Great session, keep building on this! 💪';
+  return 'Every question counts, well done for trying! 🧠';
+}
+
+export function getEarlyStopFlag() {
+  return globalThis.localStorage?.getItem('mathgame_highscore_early') === '1';
+}
+
+export function setEarlyStopFlag() {
+  globalThis.localStorage?.setItem('mathgame_highscore_early', '1');
+}
+
+export function clearEarlyStopFlag() {
+  globalThis.localStorage?.removeItem('mathgame_highscore_early');
+}
