@@ -438,6 +438,59 @@
 
     #btn-practise-again { margin-bottom: 10px; }
 
+    /* ── STOP SESSION ── */
+    #screen-game { position: relative; }
+    #btn-stop-game {
+      position: absolute;
+      top: 16px;
+      right: 16px;
+      font-size: 0.85rem;
+      padding: 6px 12px;
+      min-width: 44px;
+      min-height: 44px;
+      z-index: 1;
+    }
+    /* I4 fix: prevent stop button overlapping score display */
+    .game-header { padding-right: 64px; }
+
+    .stop-overlay {
+      position: absolute;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.55);
+      border-radius: var(--radius);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 10;
+    }
+
+    .stop-overlay-card {
+      background: var(--clr-card);
+      border-radius: var(--radius);
+      padding: 24px 20px;
+      max-width: 300px;
+      width: 90%;
+      text-align: center;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.18);
+    }
+
+    .stop-overlay-title {
+      font-size: 1.2rem;
+      font-weight: 700;
+      margin-bottom: 6px;
+    }
+
+    .stop-overlay-subtitle {
+      color: var(--clr-muted);
+      font-size: 0.95rem;
+      margin-bottom: 20px;
+    }
+
+    .stop-overlay-card .btn { margin-top: 8px; }
+
+    #screen-stop-summary .summary-stats { margin: 12px 0; }
+    #btn-stop-play-again { margin-top: 10px; }
+
     /* ── MOTION: transitions only for users who want them ── */
     @media (prefers-reduced-motion: no-preference) {
       .timer-bar { transition: width 0.1s linear; }
@@ -483,6 +536,7 @@
 
     <!-- ── GAME SCREEN ── -->
     <section id="screen-game" hidden>
+      <button id="btn-stop-game" class="btn-stop" aria-label="Stop game">⛔ Stop</button>
       <header class="game-header">
         <div id="hearts-container" class="hearts" aria-live="polite" aria-label="Lives remaining: 3">
           ❤️❤️❤️
@@ -516,6 +570,16 @@
       <div id="choices-container" class="choices" role="group" aria-label="Answer choices"></div>
 
       <div id="feedback-container" class="feedback" aria-live="polite" aria-atomic="true"></div>
+
+      <div id="stop-confirm-overlay" class="stop-overlay" hidden
+           role="dialog" aria-modal="true" aria-labelledby="stop-confirm-title">
+        <div class="stop-overlay-card">
+          <p id="stop-confirm-title" class="stop-overlay-title">Are you sure you want to stop? 🤔</p>
+          <p class="stop-overlay-subtitle">Your progress so far will be shown.</p>
+          <button class="btn btn-secondary" id="btn-keep-playing">Keep playing ▶️</button>
+          <button class="btn btn-stop"      id="btn-confirm-stop">Yes, stop 🛑</button>
+        </div>
+      </div>
     </section>
 
     <!-- ── RESULTS SCREEN ── -->
@@ -527,6 +591,26 @@
       <p id="result-highscore"     class="result-highscore"></p>
       <p id="result-new-highscore" class="result-new-highscore" hidden>🏆 New high score!</p>
       <button class="btn btn-primary" id="btn-play-again">▶ Play Again</button>
+    </section>
+
+    <!-- ── STOP SUMMARY ── -->
+    <section id="screen-stop-summary" hidden>
+      <h2>Session stopped early 🛑</h2>
+      <div id="stop-stars-container" class="stars" role="img" aria-label="0 stars out of 3"></div>
+      <div class="summary-stats">
+        <p id="stop-questions-answered"></p>
+        <p id="stop-correct"></p>
+        <p id="stop-incorrect"></p>
+        <p id="stop-accuracy"></p>
+        <p id="stop-score"></p>
+        <p id="stop-streak"></p>
+        <p id="stop-hearts"></p>
+      </div>
+      <p id="stop-highscore"     class="result-highscore"></p>
+      <p id="stop-new-highscore" class="result-new-highscore" hidden>🏆 New high score!</p>
+      <p id="stop-message" class="summary-message" aria-live="off"></p>
+      <button class="btn btn-primary"   id="btn-stop-main-menu">🏠 Main Menu</button>
+      <button class="btn btn-secondary" id="btn-stop-play-again">🔄 Play Again</button>
     </section>
 
     <!-- ── PRACTICE: OPERATION SELECTOR ── -->
@@ -610,6 +694,11 @@
       getGameConfigForTimer,
       getTimerPreference,
       setTimerPreference,
+      calculateEarlyStopStars,
+      getEarlyStopMessage,
+      getEarlyStopFlag,
+      setEarlyStopFlag,
+      clearEarlyStopFlag,
     } from './js/math-engine.js';
 
     // ── STATE ──────────────────────────────────────────────────────────────
@@ -618,12 +707,14 @@
     let practiceSession = null;
     let practiceOperation = null;
     let selectedTimerIndex = 2; // index into TIMER_OPTIONS; 2 = 15 s (default)
+    let stopOverlayActive = false;
 
     function newSession(config) {
       return {
         score: 0,
         lives: 3,
         streak: 0,
+        bestStreak: 0,
         questionIndex: 0,
         correctAnswers: 0,
         questionsAnswered: 0,
@@ -631,6 +722,8 @@
         questions: generateRound(config),
         timerTicks: config.timerSeconds * 10,
         timerHandle: null,
+        pendingAdvance: null,
+        pendingGameOver: null,
         phase: 'question',
       };
     }
@@ -671,6 +764,19 @@
 
     function startTimer() {
       session.timerTicks = session.config.timerSeconds * 10;
+      updateTimerBar();
+      if (stopOverlayActive) return;
+      session.timerHandle = setInterval(() => {
+        session.timerTicks--;
+        updateTimerBar();
+        if (session.timerTicks <= 0) {
+          stopTimer();
+          showFeedback(null, true);
+        }
+      }, 100);
+    }
+
+    function resumeTimer() {
       updateTimerBar();
       session.timerHandle = setInterval(() => {
         session.timerTicks--;
@@ -754,6 +860,7 @@
       // Score + streak + timer bonus
       const { newStreak, pts } = updateStreak(session.streak, correct, session.config);
       session.streak = newStreak;
+      if (session.streak > session.bestStreak) session.bestStreak = session.streak;
       session.score += pts;
       let bonusPts = 0;
       if (correct) {
@@ -786,12 +893,12 @@
         session.lives = newLives;
         renderHearts(session.lives);
         if (isGameOver) {
-          setTimeout(showResults, 1200);
+          session.pendingGameOver = setTimeout(showResults, 1200);
           return;
         }
       }
 
-      setTimeout(advanceRound, 1000);
+      session.pendingAdvance = setTimeout(advanceRound, 1000);
     }
 
     function advanceRound() {
@@ -807,6 +914,10 @@
     // ── RESULTS ────────────────────────────────────────────────────────────
 
     function showResults() {
+      if (stopOverlayActive) {
+        stopOverlayActive = false;
+        document.getElementById('stop-confirm-overlay').hidden = true;
+      }
       showScreen('screen-results');
 
       const stars = calculateStars(session.score, GameConfig);
@@ -823,7 +934,11 @@
 
       const prevHigh = getHighScore();
       const isNewHigh = session.score > prevHigh;
-      if (isNewHigh) setHighScore(session.score);
+      if (isNewHigh) {
+        setHighScore(session.score);
+        clearEarlyStopFlag();
+      }
+      renderHighScore();
       document.getElementById('result-highscore').textContent =
         `Best: ${isNewHigh ? session.score : prevHigh} pts`;
       document.getElementById('result-new-highscore').hidden = !isNewHigh;
@@ -834,6 +949,7 @@
     // ── GAME START ─────────────────────────────────────────────────────────
 
     function startGame(timerOption) {
+      stopOverlayActive = false;
       const cfg = getGameConfigForTimer(timerOption.seconds);
       session = newSession(cfg);
       document.getElementById('timer-hud-label').textContent = `⏱️ ${timerOption.seconds}s`;
@@ -846,6 +962,101 @@
       startGame(TIMER_OPTIONS[selectedTimerIndex]);
     });
     document.getElementById('btn-play-again').addEventListener('click', () => {
+      startGame(TIMER_OPTIONS[selectedTimerIndex]);
+    });
+
+    // ── STOP SESSION ──────────────────────────────────────────────────────
+
+    function renderHighScore() {
+      const hs = getHighScore();
+      const el = document.getElementById('start-highscore');
+      if (hs > 0) {
+        el.textContent = getEarlyStopFlag() ? `Best: ${hs} pts 🛑` : `Best: ${hs} pts`;
+      } else {
+        el.textContent = '';
+      }
+    }
+
+    function showStopOverlay() {
+      if (stopOverlayActive) return;
+      stopOverlayActive = true;
+      stopTimer();
+      document.getElementById('stop-confirm-overlay').hidden = false;
+      document.getElementById('btn-keep-playing').focus();
+    }
+
+    function hideStopOverlay() {
+      stopOverlayActive = false;
+      document.getElementById('stop-confirm-overlay').hidden = true;
+      document.getElementById('btn-stop-game').focus();
+      if (session.phase === 'question') resumeTimer();
+    }
+
+    function showStopSummary() {
+      clearTimeout(session.pendingAdvance);
+      clearTimeout(session.pendingGameOver);
+
+      const { questionsAnswered, correctAnswers, score, lives, bestStreak, config } = session;
+      const incorrect = questionsAnswered - correctAnswers;
+      const pct = questionsAnswered === 0 ? 0 : Math.round(correctAnswers / questionsAnswered * 100);
+      const stars = calculateEarlyStopStars(questionsAnswered, correctAnswers);
+
+      const starsEl = document.getElementById('stop-stars-container');
+      starsEl.setAttribute('aria-label', `${stars} stars out of 3`);
+      starsEl.innerHTML = [0, 1, 2]
+        .map(i => `<span aria-hidden="true">${i < stars ? '⭐' : '☆'}</span>`)
+        .join('');
+
+      document.getElementById('stop-questions-answered').textContent =
+        `${questionsAnswered} of ${config.totalQuestions} questions answered`;
+      document.getElementById('stop-correct').textContent   = `${correctAnswers} correct ✅`;
+      document.getElementById('stop-incorrect').textContent = `${incorrect} incorrect ❌`;
+      document.getElementById('stop-accuracy').textContent  = `${pct}% accuracy`;
+      document.getElementById('stop-score').textContent     = `Score: ${score} pts`;
+      document.getElementById('stop-streak').textContent    = `Best streak 🔥: ${bestStreak}`;
+      document.getElementById('stop-hearts').textContent    =
+        `Hearts remaining: ${'❤️'.repeat(lives)}${'🤍'.repeat(3 - lives)}`;
+
+      const prevHigh = getHighScore();
+      const isNewHigh = questionsAnswered >= 1 && score > prevHigh;
+      if (isNewHigh) {
+        setHighScore(score);
+        setEarlyStopFlag();
+      }
+      renderHighScore();
+      document.getElementById('stop-highscore').textContent =
+        `Best: ${isNewHigh ? score : prevHigh} pts`;
+      document.getElementById('stop-new-highscore').hidden = !isNewHigh;
+
+      document.getElementById('stop-message').textContent =
+        getEarlyStopMessage(questionsAnswered, correctAnswers);
+
+      document.getElementById('btn-stop-play-again').hidden = questionsAnswered === 0;
+
+      showScreen('screen-stop-summary');
+      document.getElementById('btn-stop-main-menu').focus();
+    }
+
+    document.getElementById('btn-stop-game').addEventListener('click', showStopOverlay);
+
+    document.getElementById('btn-keep-playing').addEventListener('click', hideStopOverlay);
+
+    document.getElementById('btn-confirm-stop').addEventListener('click', () => {
+      hideStopOverlay();
+      showStopSummary();
+    });
+
+    document.addEventListener('keydown', e => {
+      if (e.key === 'Escape' && stopOverlayActive) hideStopOverlay();
+    });
+
+    document.getElementById('btn-stop-main-menu').addEventListener('click', () => {
+      session = null;
+      showScreen('screen-start');
+      renderHighScore();
+    });
+
+    document.getElementById('btn-stop-play-again').addEventListener('click', () => {
       startGame(TIMER_OPTIONS[selectedTimerIndex]);
     });
 
@@ -873,11 +1084,7 @@
     selectedTimerIndex = foundIdx !== -1 ? foundIdx : 2;
     renderTimerSelector();
 
-    // Show high score on start screen if one exists
-    const hs = getHighScore();
-    if (hs > 0) {
-      document.getElementById('start-highscore').textContent = `Best: ${hs} pts`;
-    }
+    renderHighScore();
 
     // ── PRACTICE MODE ──────────────────────────────────────────────────────
 

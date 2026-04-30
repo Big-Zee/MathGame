@@ -17,6 +17,8 @@ import {
   TIMER_OPTIONS,
   getGameConfigForTimer,
   getTimerPreference,
+  calculateEarlyStopStars,
+  getEarlyStopMessage,
 } from '../js/math-engine.js';
 
 // ── T006: buildChoices + generateQuestion invariants ──────────────────────
@@ -431,5 +433,84 @@ describe('Practice accuracy tier', () => {
 
   it('0 answered → 0% accuracy → keep-going tier', () => {
     assert.equal(getAccuracyTier(0, 0), 'keep-going');
+  });
+});
+
+// ── Stop Session: calculateEarlyStopStars ────────────────────────────────
+
+describe('calculateEarlyStopStars', () => {
+  it('0 answered → 0 stars', () => {
+    assert.equal(calculateEarlyStopStars(0, 0), 0);
+  });
+
+  it('100% accuracy (10/10) → 3 stars', () => {
+    assert.equal(calculateEarlyStopStars(10, 10), 3);
+  });
+
+  it('80% accuracy (8/10) → 3 stars (boundary)', () => {
+    assert.equal(calculateEarlyStopStars(10, 8), 3);
+  });
+
+  it('79% accuracy (≈8/10 rounded down) → 2 stars', () => {
+    // 7/9 = 77.8% → rounds to 78 → 2 stars
+    assert.equal(calculateEarlyStopStars(9, 7), 2);
+  });
+
+  it('50% accuracy (5/10) → 2 stars (boundary)', () => {
+    assert.equal(calculateEarlyStopStars(10, 5), 2);
+  });
+
+  it('67% accuracy (4/6) → 2 stars', () => {
+    assert.equal(calculateEarlyStopStars(6, 4), 2);
+  });
+
+  it('40% accuracy (4/10) → 1 star', () => {
+    assert.equal(calculateEarlyStopStars(10, 4), 1);
+  });
+});
+
+// ── Stop Session: getEarlyStopMessage ────────────────────────────────────
+
+describe('getEarlyStopMessage', () => {
+  it('0 answered → no-questions message', () => {
+    assert.equal(
+      getEarlyStopMessage(0, 0),
+      "You didn't answer any questions yet — give it a go! 😊",
+    );
+  });
+
+  it('80% accuracy (8/10) → fire message', () => {
+    assert.equal(
+      getEarlyStopMessage(10, 8),
+      'Brilliant effort, you were on fire! 🔥',
+    );
+  });
+
+  it('100% accuracy (10/10) → fire message', () => {
+    assert.equal(
+      getEarlyStopMessage(10, 10),
+      'Brilliant effort, you were on fire! 🔥',
+    );
+  });
+
+  it('70% accuracy (7/10) → keep-building message', () => {
+    assert.equal(
+      getEarlyStopMessage(10, 7),
+      'Great session, keep building on this! 💪',
+    );
+  });
+
+  it('50% accuracy (5/10) → keep-building message (boundary)', () => {
+    assert.equal(
+      getEarlyStopMessage(10, 5),
+      'Great session, keep building on this! 💪',
+    );
+  });
+
+  it('40% accuracy (4/10) → every-question-counts message', () => {
+    assert.equal(
+      getEarlyStopMessage(10, 4),
+      'Every question counts, well done for trying! 🧠',
+    );
   });
 });
