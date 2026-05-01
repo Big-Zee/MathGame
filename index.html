@@ -605,6 +605,223 @@
         animation: badge-pop-in 0.22s ease-out;
       }
     }
+
+    /* ── NAME PICKER ── */
+    .name-picker-prompt {
+      text-align: center;
+      font-weight: 700;
+      font-size: 1rem;
+      color: var(--clr-text);
+      margin-bottom: 12px;
+    }
+
+    .name-picker-buttons {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      justify-content: center;
+      margin-bottom: 12px;
+    }
+
+    .name-btn {
+      min-width: 120px;
+      min-height: 52px;
+      padding: 10px 14px;
+      border: 2px solid #CBD5E1;
+      border-radius: var(--radius);
+      background: #F8FAFC;
+      color: var(--clr-text);
+      font-size: 0.95rem;
+      font-weight: 700;
+      cursor: pointer;
+      text-align: center;
+      line-height: 1.3;
+    }
+    .name-btn:hover { background: #E2E8F0; border-color: var(--clr-primary); }
+    .name-btn:focus-visible {
+      outline: 3px solid var(--clr-primary);
+      outline-offset: 3px;
+    }
+    .name-btn-selected {
+      background: #FEF9C3;
+      border-color: #CA8A04;
+      color: #78350F;
+    }
+    .name-btn-add {
+      background: #EFF6FF;
+      border-color: var(--clr-primary);
+      color: var(--clr-primary);
+    }
+    .name-btn-add:hover { background: #DBEAFE; }
+
+    .name-btn-pb { display: block; font-size: 0.75rem; font-weight: 400; color: var(--clr-muted); }
+
+    .name-picker-input-wrap { margin-bottom: 12px; }
+
+    .name-picker-input {
+      display: block;
+      width: 100%;
+      padding: 12px 16px;
+      border: 2px solid #CBD5E1;
+      border-radius: var(--radius);
+      font-size: 1rem;
+      color: var(--clr-text);
+      background: #fff;
+    }
+    .name-picker-input:focus {
+      outline: 3px solid var(--clr-primary);
+      outline-offset: 0;
+      border-color: var(--clr-primary);
+    }
+
+    .name-picker-no-qualify {
+      text-align: center;
+      font-size: 1rem;
+      font-weight: 700;
+      color: var(--clr-primary);
+      background: #EFF6FF;
+      border-radius: var(--radius);
+      padding: 12px;
+      margin-bottom: 12px;
+    }
+
+    .name-picker-actions {
+      display: flex;
+      gap: 10px;
+      flex-direction: column;
+    }
+
+    #btn-save-score:disabled,
+    #btn-stop-save-score:disabled { opacity: 0.45; cursor: not-allowed; }
+
+    /* ── LEADERBOARD SCREEN ── */
+    #screen-leaderboard { padding: 24px 20px; }
+
+    .lb-banner {
+      background: #FEF9C3;
+      border: 2px solid #CA8A04;
+      border-radius: var(--radius);
+      padding: 10px 16px;
+      text-align: center;
+      font-weight: 700;
+      font-size: 1.05rem;
+      color: #78350F;
+      margin-bottom: 16px;
+    }
+
+    .lb-stats {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+      background: #F8FAFC;
+      border-radius: var(--radius);
+      padding: 12px 16px;
+      margin-bottom: 16px;
+    }
+
+    .lb-stats-item {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .lb-stats-label {
+      font-size: 0.75rem;
+      color: var(--clr-muted);
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+
+    .lb-stats-value {
+      font-size: 1.05rem;
+      font-weight: 700;
+      color: var(--clr-text);
+    }
+
+    .lb-empty {
+      text-align: center;
+      color: var(--clr-muted);
+      font-size: 1rem;
+      padding: 20px 0;
+    }
+
+    .lb-table-wrap {
+      overflow-x: auto;
+      margin-bottom: 16px;
+    }
+
+    .lb-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.9rem;
+    }
+
+    .lb-table th {
+      text-align: left;
+      padding: 8px 6px;
+      font-size: 0.78rem;
+      color: var(--clr-muted);
+      border-bottom: 2px solid #E2E8F0;
+      white-space: nowrap;
+    }
+
+    .lb-table td {
+      padding: 8px 6px;
+      border-bottom: 1px solid #F1F5F9;
+      vertical-align: middle;
+      white-space: nowrap;
+    }
+
+    .lb-row-highlight {
+      background: #FEF9C3;
+    }
+
+    .lb-actions {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      margin-top: 4px;
+    }
+
+    #btn-lb-clear {
+      font-size: 0.9rem;
+      color: var(--clr-muted);
+      text-align: center;
+      margin-top: 4px;
+    }
+    #btn-lb-clear:hover { color: var(--clr-wrong); }
+
+    .lb-clear-confirm {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.55);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 20;
+    }
+    .lb-clear-confirm[hidden] { display: none; }
+
+    .lb-clear-confirm-card {
+      background: var(--clr-card);
+      border-radius: var(--radius);
+      padding: 24px 20px;
+      max-width: 300px;
+      width: 90%;
+      text-align: center;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.18);
+    }
+
+    .lb-clear-confirm-title {
+      font-size: 1.1rem;
+      font-weight: 700;
+      margin-bottom: 16px;
+    }
+
+    .lb-clear-confirm-card .btn { margin-top: 8px; }
+
+    /* ── START SCREEN LEADERBOARD BUTTON ── */
+    #btn-leaderboard { margin-bottom: 10px; }
   </style>
 </head>
 <body>
@@ -637,6 +854,7 @@
 
       <button class="btn btn-primary" id="btn-play" style="margin-bottom:10px">▶ Play!</button>
       <button class="btn btn-secondary" id="btn-practice" style="margin-bottom:10px">📚 Practice Mode</button>
+      <button class="btn btn-secondary" id="btn-leaderboard" style="margin-bottom:10px">🏆 Leaderboard</button>
       <button class="btn btn-secondary" id="btn-badges">🏅 Badges</button>
     </section>
 
@@ -696,7 +914,26 @@
       <p id="result-correct"       class="result-correct"></p>
       <p id="result-highscore"     class="result-highscore"></p>
       <p id="result-new-highscore" class="result-new-highscore" hidden>🏆 New high score!</p>
-      <button class="btn btn-primary" id="btn-play-again">▶ Play Again</button>
+
+      <!-- ── NAME PICKER ── -->
+      <div id="name-picker" hidden>
+        <p id="name-picker-prompt" class="name-picker-prompt"></p>
+        <div id="name-picker-buttons" class="name-picker-buttons" role="group" aria-label="Select your name"></div>
+        <div id="name-picker-input-wrap" class="name-picker-input-wrap" hidden>
+          <input id="name-picker-input" type="text" class="name-picker-input"
+                 maxlength="12" placeholder="Enter your name…" autocomplete="off"
+                 aria-label="Enter your name" />
+        </div>
+        <p id="name-picker-no-qualify" class="name-picker-no-qualify" hidden>
+          Great effort! Keep playing to make the top 10! 💪
+        </p>
+        <div class="name-picker-actions">
+          <button class="btn btn-primary" id="btn-save-score" disabled>💾 Save Score</button>
+          <button class="btn btn-secondary" id="btn-skip-save">Skip</button>
+        </div>
+      </div>
+
+      <button class="btn btn-primary" id="btn-play-again" style="margin-top:16px">▶ Play Again</button>
     </section>
 
     <!-- ── STOP SUMMARY ── -->
@@ -715,8 +952,95 @@
       <p id="stop-highscore"     class="result-highscore"></p>
       <p id="stop-new-highscore" class="result-new-highscore" hidden>🏆 New high score!</p>
       <p id="stop-message" class="summary-message" aria-live="off"></p>
-      <button class="btn btn-primary"   id="btn-stop-main-menu">🏠 Main Menu</button>
+
+      <!-- ── NAME PICKER (stop summary) ── -->
+      <div id="stop-name-picker" hidden>
+        <p id="stop-name-picker-prompt" class="name-picker-prompt"></p>
+        <div id="stop-name-picker-buttons" class="name-picker-buttons" role="group" aria-label="Select your name"></div>
+        <div id="stop-name-picker-input-wrap" class="name-picker-input-wrap" hidden>
+          <input id="stop-name-picker-input" type="text" class="name-picker-input"
+                 maxlength="12" placeholder="Enter your name…" autocomplete="off"
+                 aria-label="Enter your name" />
+        </div>
+        <p id="stop-name-picker-no-qualify" class="name-picker-no-qualify" hidden>
+          Great effort! Keep playing to make the top 10! 💪
+        </p>
+        <div class="name-picker-actions">
+          <button class="btn btn-primary" id="btn-stop-save-score" disabled>💾 Save Score</button>
+          <button class="btn btn-secondary" id="btn-stop-skip-save">Skip</button>
+        </div>
+      </div>
+
+      <button class="btn btn-primary"   id="btn-stop-main-menu" style="margin-top:16px">🏠 Main Menu</button>
       <button class="btn btn-secondary" id="btn-stop-play-again">🔄 Play Again</button>
+    </section>
+
+    <!-- ── LEADERBOARD SCREEN ── -->
+    <section id="screen-leaderboard" hidden>
+      <h2>🏆 Leaderboard</h2>
+
+      <!-- Personal best banner (shown only when new entry is rank 1) -->
+      <div id="lb-banner" class="lb-banner" hidden aria-live="polite"></div>
+
+      <!-- Stats panel -->
+      <div id="lb-stats" class="lb-stats">
+        <div class="lb-stats-item">
+          <span class="lb-stats-label">Games played</span>
+          <span id="lb-stats-games" class="lb-stats-value">0</span>
+        </div>
+        <div class="lb-stats-item">
+          <span class="lb-stats-label">Best score</span>
+          <span id="lb-stats-best-score" class="lb-stats-value">0</span>
+        </div>
+        <div class="lb-stats-item">
+          <span class="lb-stats-label">Best accuracy</span>
+          <span id="lb-stats-best-accuracy" class="lb-stats-value">0%</span>
+        </div>
+        <div class="lb-stats-item">
+          <span class="lb-stats-label">Favourite</span>
+          <span id="lb-stats-fav-diff" class="lb-stats-value">—</span>
+        </div>
+      </div>
+
+      <!-- Empty state -->
+      <p id="lb-empty" class="lb-empty" hidden>
+        No scores yet — play a game and be the first on the board! 🎮
+      </p>
+
+      <!-- Scores table -->
+      <div class="lb-table-wrap">
+        <table id="lb-table" class="lb-table" hidden>
+          <thead>
+            <tr>
+              <th scope="col">#</th>
+              <th scope="col">Name</th>
+              <th scope="col">Score</th>
+              <th scope="col">⭐</th>
+              <th scope="col">Timer</th>
+              <th scope="col">Date</th>
+            </tr>
+          </thead>
+          <tbody id="lb-table-body"></tbody>
+        </table>
+      </div>
+
+      <div class="lb-actions">
+        <button class="btn btn-primary"   id="btn-lb-play-again">▶ Play Again</button>
+        <button class="btn btn-secondary" id="btn-lb-back">🏠 Back to Menu</button>
+        <button class="btn btn-link"      id="btn-lb-clear">🗑️ Clear Leaderboard</button>
+      </div>
+
+      <!-- Clear confirmation modal -->
+      <div id="lb-clear-confirm" class="lb-clear-confirm" hidden
+           role="dialog" aria-modal="true" aria-labelledby="lb-clear-confirm-title">
+        <div class="lb-clear-confirm-card">
+          <p id="lb-clear-confirm-title" class="lb-clear-confirm-title">
+            Are you sure? This will delete all saved scores. 🗑️
+          </p>
+          <button class="btn btn-stop"      id="btn-lb-clear-yes">Yes, clear</button>
+          <button class="btn btn-secondary" id="btn-lb-clear-cancel">Cancel</button>
+        </div>
+      </div>
     </section>
 
     <!-- ── PRACTICE: OPERATION SELECTOR ── -->
@@ -834,6 +1158,18 @@
       checkBadgesAfterQuestion, checkBadgesAfterGame, checkBadgesAfterPractice,
       awardBadges,
     } from './js/badge-engine.js';
+
+    import {
+      loadLeaderboard, saveEntry,
+      loadStats, updateStats,
+      clearLeaderboard,
+      isEligibleForNamePicker, qualifiesForTop10,
+      sortLeaderboard,
+      getUniquePlayers, resolvePlayerName,
+      getLastPlayerName, setLastPlayerName,
+      getFavouriteDifficulty,
+      formatEntryDate,
+    } from './js/leaderboard-engine.js';
 
     // ── STATE ──────────────────────────────────────────────────────────────
 
@@ -1238,11 +1574,333 @@
       document.getElementById('btn-play-again').focus();
     }
 
+    // ── LEADERBOARD HELPERS ────────────────────────────────────────────────
+
+    function sessionToGameData(s) {
+      const pct = s.questionsAnswered === 0
+        ? 0
+        : Math.round(s.correctAnswers / s.questionsAnswered * 100);
+      return {
+        score:             s.score,
+        accuracy:          pct,
+        difficulty:        'Standard',
+        questionsAnswered: s.questionsAnswered,
+        isPractice:        false,
+        bestStreak:        s.bestStreak,
+        stoppedEarly:      s.stoppedEarly || false,
+      };
+    }
+
+    function renderNamePicker(s, pickerPrefix) {
+      // pickerPrefix: '' for results screen, 'stop-' for stop-summary screen
+      const prefix = pickerPrefix || '';
+      const pickerId       = prefix ? 'stop-name-picker'               : 'name-picker';
+      const promptId       = prefix ? 'stop-name-picker-prompt'        : 'name-picker-prompt';
+      const buttonsId      = prefix ? 'stop-name-picker-buttons'       : 'name-picker-buttons';
+      const inputWrapId    = prefix ? 'stop-name-picker-input-wrap'    : 'name-picker-input-wrap';
+      const inputId        = prefix ? 'stop-name-picker-input'         : 'name-picker-input';
+      const noQualifyId    = prefix ? 'stop-name-picker-no-qualify'    : 'name-picker-no-qualify';
+      const saveBtnId      = prefix ? 'btn-stop-save-score'            : 'btn-save-score';
+
+      const pickerEl    = document.getElementById(pickerId);
+      const promptEl    = document.getElementById(promptId);
+      const buttonsEl   = document.getElementById(buttonsId);
+      const inputWrapEl = document.getElementById(inputWrapId);
+      const inputEl     = document.getElementById(inputId);
+      const noQualEl    = document.getElementById(noQualifyId);
+      const saveBtn     = document.getElementById(saveBtnId);
+
+      const gameData = sessionToGameData(s);
+
+      if (!isEligibleForNamePicker(gameData)) {
+        pickerEl.hidden = true;
+        return;
+      }
+
+      if (!qualifiesForTop10(s.score)) {
+        pickerEl.hidden = false;
+        promptEl.hidden = true;
+        buttonsEl.hidden = true;
+        inputWrapEl.hidden = true;
+        noQualEl.hidden = false;
+        saveBtn.parentElement.hidden = true;
+        return;
+      }
+
+      pickerEl.hidden = false;
+      noQualEl.hidden = true;
+      saveBtn.parentElement.hidden = false;
+      saveBtn.disabled = true;
+
+      const entries = loadLeaderboard();
+      const players = getUniquePlayers(entries);
+      const lastName = getLastPlayerName();
+
+      // SCENARIO B — no entries yet
+      if (entries.length === 0) {
+        promptEl.textContent = "You're the first player! Enter your name:";
+        promptEl.hidden = false;
+        buttonsEl.innerHTML = '';
+        buttonsEl.hidden = true;
+        inputWrapEl.hidden = false;
+        inputEl.value = '';
+        inputEl.focus();
+        return;
+      }
+
+      // SCENARIO A — render name buttons
+      promptEl.textContent = "Who's playing? Pick your name or add a new one:";
+      promptEl.hidden = false;
+      buttonsEl.hidden = false;
+      buttonsEl.innerHTML = '';
+
+      let preSelectedBtn = null;
+      let lastNameMatches = false;
+
+      for (const player of players) {
+        const btn = document.createElement('button');
+        btn.className = 'name-btn';
+        btn.type = 'button';
+        btn.dataset.name = player.name;
+        btn.innerHTML = `${player.name}<span class="name-btn-pb">Best: ${player.personalBest} pts</span>`;
+        btn.setAttribute('aria-pressed', 'false');
+        btn.setAttribute('aria-label', `Select ${player.name}, personal best ${player.personalBest} points`);
+
+        btn.addEventListener('click', () => {
+          // Deselect all
+          buttonsEl.querySelectorAll('.name-btn').forEach(b => {
+            b.classList.remove('name-btn-selected');
+            b.setAttribute('aria-pressed', 'false');
+          });
+          // Clear text input
+          inputEl.value = '';
+          inputWrapEl.hidden = true;
+          // Select this
+          btn.classList.add('name-btn-selected');
+          btn.setAttribute('aria-pressed', 'true');
+          saveBtn.disabled = false;
+        });
+
+        buttonsEl.appendChild(btn);
+
+        // SCENARIO C match check
+        if (lastName && player.name.toLowerCase() === lastName.toLowerCase()) {
+          preSelectedBtn = btn;
+          lastNameMatches = true;
+        }
+      }
+
+      // "+ Add new name" button
+      const addBtn = document.createElement('button');
+      addBtn.className = 'name-btn name-btn-add';
+      addBtn.type = 'button';
+      addBtn.textContent = '+ Add new name';
+      addBtn.addEventListener('click', () => {
+        buttonsEl.querySelectorAll('.name-btn').forEach(b => {
+          b.classList.remove('name-btn-selected');
+          b.setAttribute('aria-pressed', 'false');
+        });
+        inputWrapEl.hidden = false;
+        inputEl.value = '';
+        inputEl.focus();
+        saveBtn.disabled = true;
+      });
+      buttonsEl.appendChild(addBtn);
+
+      // SCENARIO C — pre-select or fallback
+      if (preSelectedBtn) {
+        preSelectedBtn.classList.add('name-btn-selected');
+        preSelectedBtn.setAttribute('aria-pressed', 'true');
+        saveBtn.disabled = false;
+        inputWrapEl.hidden = true;
+        // T022: scroll pre-selected button into view
+        preSelectedBtn.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+      } else if (lastName && !lastNameMatches) {
+        // Scenario C fallback: expand input pre-filled
+        inputWrapEl.hidden = false;
+        inputEl.value = lastName;
+        inputEl.focus();
+        if (lastName.trim().length > 0) saveBtn.disabled = false;
+      } else {
+        inputWrapEl.hidden = true;
+      }
+    }
+
+    function _wireNamePickerInput(pickerPrefix, saveFn) {
+      const prefix   = pickerPrefix || '';
+      const inputId  = prefix ? 'stop-name-picker-input' : 'name-picker-input';
+      const saveBtnId = prefix ? 'btn-stop-save-score' : 'btn-save-score';
+      const buttonsId = prefix ? 'stop-name-picker-buttons' : 'name-picker-buttons';
+
+      const inputEl  = document.getElementById(inputId);
+      const saveBtn  = document.getElementById(saveBtnId);
+      const buttonsEl = document.getElementById(buttonsId);
+
+      inputEl.addEventListener('input', () => {
+        const val = inputEl.value.trim();
+        saveBtn.disabled = val.length === 0;
+        if (val.length > 0) {
+          // Deselect name buttons when typing
+          buttonsEl.querySelectorAll('.name-btn').forEach(b => {
+            b.classList.remove('name-btn-selected');
+            b.setAttribute('aria-pressed', 'false');
+          });
+        }
+      });
+
+      inputEl.addEventListener('keydown', e => {
+        if (e.key === 'Enter' && !saveBtn.disabled) saveFn();
+      });
+    }
+
+    let _savingResults = false;
+    let _savingStop = false;
+
+    function _buildEntry(s, resolvedName) {
+      const gameData = sessionToGameData(s);
+      const pct = gameData.accuracy;
+      const stars = s.stoppedEarly
+        ? (typeof calculateEarlyStopStars === 'function' ? calculateEarlyStopStars(s.questionsAnswered, s.correctAnswers) : 1)
+        : calculateStars(s.score);
+      return {
+        name:         resolvedName,
+        score:        s.score,
+        stars,
+        difficulty:   'Standard',
+        timerSetting: `${s.config.timerSeconds}s`,
+        stoppedEarly: s.stoppedEarly || false,
+        date:         new Date().toISOString(),
+        accuracy:     pct,
+        bestStreak:   s.bestStreak,
+      };
+    }
+
+    function _saveNameAndGo(pickerPrefix, s, guardVar, setGuard) {
+      if (guardVar) return;
+      setGuard(true);
+
+      const prefix      = pickerPrefix || '';
+      const inputId     = prefix ? 'stop-name-picker-input' : 'name-picker-input';
+      const buttonsId   = prefix ? 'stop-name-picker-buttons' : 'name-picker-buttons';
+
+      const inputEl   = document.getElementById(inputId);
+      const buttonsEl = document.getElementById(buttonsId);
+
+      const selectedBtn = buttonsEl.querySelector('.name-btn-selected');
+      const rawName = selectedBtn ? selectedBtn.dataset.name : inputEl.value;
+
+      const entries     = loadLeaderboard();
+      const players     = getUniquePlayers(entries);
+      const existingNames = players.map(p => p.name);
+      const resolvedName  = resolvePlayerName(rawName, existingNames);
+
+      const entry = _buildEntry(s, resolvedName);
+      saveEntry(entry);
+      setLastPlayerName(resolvedName);
+
+      // Find the highlight index in re-sorted leaderboard
+      const updated = sortLeaderboard(loadLeaderboard());
+      const idx = updated.findIndex(e =>
+        e.name === entry.name &&
+        e.score === entry.score &&
+        e.date === entry.date
+      );
+
+      showLeaderboard(idx >= 0 ? idx : 0);
+      setGuard(false);
+    }
+
+    function saveNameResults() {
+      _saveNameAndGo('', session, _savingResults, v => { _savingResults = v; });
+    }
+
+    function saveNameStop() {
+      _saveNameAndGo('stop-', session, _savingStop, v => { _savingStop = v; });
+    }
+
+    // ── LEADERBOARD SCREEN ─────────────────────────────────────────────────
+
+    function renderLeaderboard(highlightIndex) {
+      const entries = sortLeaderboard(loadLeaderboard());
+      const stats   = loadStats();
+
+      // Stats panel
+      document.getElementById('lb-stats-games').textContent        = stats.totalGamesPlayed;
+      document.getElementById('lb-stats-best-score').textContent   = `${stats.bestScoreEver} pts`;
+      document.getElementById('lb-stats-best-accuracy').textContent = `${stats.bestAccuracyEver}%`;
+      document.getElementById('lb-stats-fav-diff').textContent     = getFavouriteDifficulty(stats);
+
+      const bannerEl  = document.getElementById('lb-banner');
+      const emptyEl   = document.getElementById('lb-empty');
+      const tableEl   = document.getElementById('lb-table');
+      const tbodyEl   = document.getElementById('lb-table-body');
+
+      if (entries.length === 0) {
+        bannerEl.hidden = true;
+        emptyEl.hidden  = false;
+        tableEl.hidden  = true;
+        return;
+      }
+
+      emptyEl.hidden  = true;
+      tableEl.hidden  = false;
+
+      // Personal best banner
+      if (highlightIndex === 0) {
+        bannerEl.textContent = '🎉 New Personal Best! You\'re #1!';
+        bannerEl.hidden = false;
+      } else {
+        bannerEl.hidden = true;
+      }
+
+      // Rank medals
+      const medals = ['🥇', '🥈', '🥉'];
+
+      tbodyEl.innerHTML = '';
+      entries.forEach((e, i) => {
+        const tr = document.createElement('tr');
+        if (i === highlightIndex) {
+          tr.className = 'lb-row-highlight';
+          tr.setAttribute('aria-current', 'true');
+        }
+
+        const rank = i < 3 ? medals[i] : `${i + 1}.`;
+        const stars = '⭐'.repeat(e.stars) + '☆'.repeat(3 - e.stars);
+        const scoreText = e.stoppedEarly ? `${e.score} 🛑` : `${e.score}`;
+
+        tr.innerHTML = `
+          <td scope="row" aria-label="Rank ${i + 1}">${rank}</td>
+          <td>${e.name}</td>
+          <td>${scoreText}</td>
+          <td>${stars}</td>
+          <td>${e.timerSetting}</td>
+          <td>${formatEntryDate(e.date)}</td>
+        `;
+        tbodyEl.appendChild(tr);
+      });
+
+      // Scroll highlighted row into view
+      if (highlightIndex >= 0) {
+        const highlightedRow = tbodyEl.children[highlightIndex];
+        if (highlightedRow) {
+          setTimeout(() => highlightedRow.scrollIntoView({ behavior: 'smooth', block: 'nearest' }), 100);
+        }
+      }
+    }
+
+    function showLeaderboard(highlightIndex) {
+      renderLeaderboard(typeof highlightIndex === 'number' ? highlightIndex : -1);
+      showScreen('screen-leaderboard');
+    }
+
     function showResults() {
       if (stopOverlayActive) {
         stopOverlayActive = false;
         document.getElementById('stop-confirm-overlay').hidden = true;
       }
+
+      // Update cumulative stats at game end (always, before badge checks)
+      updateStats(sessionToGameData(session));
 
       // Update timers-used and check end-of-game badges
       const timers = getTimersUsed();
@@ -1257,10 +1915,12 @@
         incrementBadgesNew(gNewIds.length);
         enqueueBadgePopups(gNewIds, () => {
           renderResultsScreen();
+          renderNamePicker(session, '');
           showScreen('screen-results');
         });
       } else {
         renderResultsScreen();
+        renderNamePicker(session, '');
         showScreen('screen-results');
       }
     }
@@ -1364,6 +2024,12 @@
       clearTimeout(session.pendingAdvance);
       clearTimeout(session.pendingGameOver);
 
+      // Mark session as stopped early so entry reflects it
+      session.stoppedEarly = true;
+
+      // Update cumulative stats at game end (always, before badge checks)
+      updateStats(sessionToGameData(session));
+
       // Update timers-used and check end-of-game badges
       const timers = getTimersUsed();
       const updatedTimers = timers.includes(session.config.timerSeconds)
@@ -1377,10 +2043,12 @@
         incrementBadgesNew(sNewIds.length);
         enqueueBadgePopups(sNewIds, () => {
           renderStopSummaryScreen();
+          renderNamePicker(session, 'stop-');
           showScreen('screen-stop-summary');
         });
       } else {
         renderStopSummaryScreen();
+        renderNamePicker(session, 'stop-');
         showScreen('screen-stop-summary');
       }
     }
@@ -1398,6 +2066,10 @@
       if (e.key === 'Escape' && stopOverlayActive) hideStopOverlay();
       if (e.key === 'Escape' && !document.getElementById('badge-unlock-popup').hidden) {
         dismissCurrentPopup();
+      }
+      if (e.key === 'Escape' && !document.getElementById('lb-clear-confirm').hidden) {
+        document.getElementById('lb-clear-confirm').hidden = true;
+        document.getElementById('btn-lb-clear').focus();
       }
     });
 
@@ -1417,6 +2089,74 @@
 
     document.getElementById('btn-stop-play-again').addEventListener('click', () => {
       startGame(TIMER_OPTIONS[selectedTimerIndex]);
+    });
+
+    // ── NAME PICKER WIRING ────────────────────────────────────────────────
+
+    // Results screen
+    document.getElementById('btn-save-score').addEventListener('click', saveNameResults);
+    document.getElementById('btn-skip-save').addEventListener('click', () => {
+      document.getElementById('name-picker').hidden = true;
+      showScreen('screen-start');
+      renderHighScore();
+      updateBadgesButton();
+    });
+    _wireNamePickerInput('', saveNameResults);
+
+    // Stop summary screen
+    document.getElementById('btn-stop-save-score').addEventListener('click', saveNameStop);
+    document.getElementById('btn-stop-skip-save').addEventListener('click', () => {
+      document.getElementById('stop-name-picker').hidden = true;
+      showScreen('screen-start');
+      renderHighScore();
+      updateBadgesButton();
+    });
+    _wireNamePickerInput('stop-', saveNameStop);
+
+    // ── LEADERBOARD SCREEN WIRING ─────────────────────────────────────────
+
+    document.getElementById('btn-lb-back').addEventListener('click', () => {
+      showScreen('screen-start');
+      renderHighScore();
+      updateBadgesButton();
+    });
+
+    document.getElementById('btn-lb-play-again').addEventListener('click', () => {
+      startGame(TIMER_OPTIONS[selectedTimerIndex]);
+    });
+
+    document.getElementById('btn-leaderboard').addEventListener('click', () => {
+      showLeaderboard(-1);
+    });
+
+    document.getElementById('btn-lb-clear').addEventListener('click', () => {
+      document.getElementById('lb-clear-confirm').hidden = false;
+      document.getElementById('btn-lb-clear-yes').focus();
+    });
+
+    // Focus trap for clear-confirm modal
+    document.getElementById('lb-clear-confirm').addEventListener('keydown', e => {
+      if (e.key !== 'Tab') return;
+      const focusable = ['btn-lb-clear-yes', 'btn-lb-clear-cancel']
+        .map(id => document.getElementById(id));
+      const first = focusable[0];
+      const last  = focusable[focusable.length - 1];
+      if (e.shiftKey) {
+        if (document.activeElement === first) { e.preventDefault(); last.focus(); }
+      } else {
+        if (document.activeElement === last)  { e.preventDefault(); first.focus(); }
+      }
+    });
+
+    document.getElementById('btn-lb-clear-yes').addEventListener('click', () => {
+      clearLeaderboard();
+      document.getElementById('lb-clear-confirm').hidden = true;
+      renderLeaderboard(-1);
+    });
+
+    document.getElementById('btn-lb-clear-cancel').addEventListener('click', () => {
+      document.getElementById('lb-clear-confirm').hidden = true;
+      document.getElementById('btn-lb-clear').focus();
     });
 
     // ── TIMER SELECTOR ────────────────────────────────────────────────────
