@@ -1761,7 +1761,7 @@
       const pct = gameData.accuracy;
       const stars = s.stoppedEarly
         ? (typeof calculateEarlyStopStars === 'function' ? calculateEarlyStopStars(s.questionsAnswered, s.correctAnswers) : 1)
-        : calculateStars(s.score);
+        : calculateStars(s.score, s.config);
       return {
         name:         resolvedName,
         score:        s.score,
@@ -1782,32 +1782,42 @@
       const prefix      = pickerPrefix || '';
       const inputId     = prefix ? 'stop-name-picker-input' : 'name-picker-input';
       const buttonsId   = prefix ? 'stop-name-picker-buttons' : 'name-picker-buttons';
+      const saveBtnId   = prefix ? 'btn-stop-save-score' : 'btn-save-score';
 
       const inputEl   = document.getElementById(inputId);
       const buttonsEl = document.getElementById(buttonsId);
+      const saveBtn   = document.getElementById(saveBtnId);
 
-      const selectedBtn = buttonsEl.querySelector('.name-btn-selected');
-      const rawName = selectedBtn ? selectedBtn.dataset.name : inputEl.value;
+      saveBtn.disabled = true;
 
-      const entries     = loadLeaderboard();
-      const players     = getUniquePlayers(entries);
-      const existingNames = players.map(p => p.name);
-      const resolvedName  = resolvePlayerName(rawName, existingNames);
+      try {
+        const selectedBtn = buttonsEl.querySelector('.name-btn-selected');
+        const rawName = selectedBtn ? selectedBtn.dataset.name : inputEl.value;
 
-      const entry = _buildEntry(s, resolvedName);
-      saveEntry(entry);
-      setLastPlayerName(resolvedName);
+        const entries     = loadLeaderboard();
+        const players     = getUniquePlayers(entries);
+        const existingNames = players.map(p => p.name);
+        const resolvedName  = resolvePlayerName(rawName, existingNames);
 
-      // Find the highlight index in re-sorted leaderboard
-      const updated = sortLeaderboard(loadLeaderboard());
-      const idx = updated.findIndex(e =>
-        e.name === entry.name &&
-        e.score === entry.score &&
-        e.date === entry.date
-      );
+        const entry = _buildEntry(s, resolvedName);
+        saveEntry(entry);
+        setLastPlayerName(resolvedName);
 
-      showLeaderboard(idx >= 0 ? idx : 0);
-      setGuard(false);
+        // Find the highlight index in re-sorted leaderboard
+        const updated = sortLeaderboard(loadLeaderboard());
+        const idx = updated.findIndex(e =>
+          e.name === entry.name &&
+          e.score === entry.score &&
+          e.date === entry.date
+        );
+
+        showLeaderboard(idx >= 0 ? idx : 0);
+      } catch (err) {
+        console.error('[Save Score] Save failed:', err);
+        saveBtn.disabled = false;
+      } finally {
+        setGuard(false);
+      }
     }
 
     function saveNameResults() {
